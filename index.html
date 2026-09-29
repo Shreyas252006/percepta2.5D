@@ -1,0 +1,2834 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<style>
+  @layer base {
+    html, body { margin: 0; padding: 0; background-color: #070a0f; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+    body { overscroll-behavior: none; }
+    main>:first-child { margin-top: 0 !important; }
+    main>:last-child { margin-bottom: 0 !important; }
+  }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: #070a0f; }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
+</style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-container-low": "#0b0f17",
+          "surface-container-lowest": "#070a0f",
+          "surface": "#090d14",
+          "surface-container": "#0d131d",
+          "surface-container-high": "#111827",
+          "surface-container-highest": "#162032",
+          "primary": "#7dd3fc",
+          "primary-container": "#0b3954",
+          "on-primary-container": "#c8eaff",
+          "on-surface": "#e2e8f0",
+          "on-surface-variant": "#94a3b8",
+          "outline": "#334155",
+          "outline-variant": "#1e293b",
+          "error": "#f87171",
+          "tertiary": "#c084fc",
+          "background": "#070a0f",
+        },
+        fontFamily: {
+          body: ["Inter", "sans-serif"],
+          headline: ["Inter", "sans-serif"],
+          mono: ["JetBrains Mono", "monospace"]
+        }
+      }
+    }
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body class="bg-background font-body text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container"><div class="min-h-screen bg-[#050505] text-[#E2E8F0] font-body flex flex-col antialiased selection:bg-emerald-500/20 selection:text-emerald-400"><header class="h-16 bg-[#101010] border-b border-[#1E1E1E] flex items-center justify-between px-6 sticky top-0 z-50"><div class="flex items-center gap-4"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[#22C55E] text-[24px]">radar</span><span class="font-headline font-bold text-sm tracking-widest text-[#22C55E]">MAPPERZ</span></div><div class="h-4 w-[1px] bg-[#1E1E1E]"></div><div class="flex items-center gap-2 text-xs font-medium"><span class="px-2.5 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-400">SEQ: <strong class="text-white">#08492</strong></span><span class="px-2.5 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-400">FRAME: <strong class="text-[#22C55E]">#14289</strong></span><span class="px-2.5 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-400">LOC: <strong class="text-white">SF-BAY-US-101</strong></span></div></div><div class="flex items-center gap-3 text-xs font-medium"><div class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A]"><span class="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span><span class="text-[#22C55E]">ONLINE</span></div><div class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300">INFERENCE: <span class="text-[#22C55E]">ACTIVE</span></div><div class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300">FPS: <strong class="text-white">59.4</strong></div><div class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300">LATENCY: <strong class="text-white">16.2ms</strong></div><div class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300">GPU: <strong class="text-white">H100 42%</strong></div><div class="flex items-center gap-2 pl-2 text-neutral-400"><button class="p-1.5 hover:text-white rounded-lg hover:bg-[#1E1E1E] transition-colors"><span class="material-symbols-outlined text-[18px]">search</span></button><button class="p-1.5 hover:text-white rounded-lg hover:bg-[#1E1E1E] transition-colors"><span class="material-symbols-outlined text-[18px]">notifications</span></button><button class="p-1.5 hover:text-white rounded-lg hover:bg-[#1E1E1E] transition-colors"><span class="material-symbols-outlined text-[18px]">settings</span></button></div></div></header><main class="flex-1 p-4 grid grid-cols-12 gap-4 max-w-[1920px] mx-auto w-full"><div id="lidar-panel-root" class="col-span-4 bg-[#101010] border border-[#1E1E1E] rounded-2xl flex flex-col overflow-hidden shadow-2xl relative transition-all duration-300">
+  <!-- Panel Header -->
+  <div class="px-4 py-3 bg-[#141414] border-b border-[#1E1E1E] flex items-center justify-between select-none z-10">
+    <div class="flex items-center gap-2.5">
+      <span class="material-symbols-outlined text-cyan-400 text-[18px]">scatter_plot</span>
+      <span class="font-bold text-xs tracking-wider text-white">3D LIDAR POINT CLOUD</span>
+      <span class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] text-cyan-400 font-mono font-medium">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+        <span id="header-pts-badge">100K PTS</span>
+      </span>
+      <span class="hidden sm:inline-block px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-[9px] font-mono text-neutral-400">
+        HDL-64E
+      </span>
+    </div>
+    <div class="flex items-center gap-1">
+      <button id="btn-reset-cam" class="p-1.5 text-neutral-400 hover:text-white hover:bg-[#1E1E1E] rounded-lg transition-colors" title="Reset Camera (Perspective 3D)">
+        <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+      </button>
+      <button id="btn-top-view" class="p-1.5 text-neutral-400 hover:text-white hover:bg-[#1E1E1E] rounded-lg transition-colors" title="Top-Down Bird's Eye View">
+        <span class="material-symbols-outlined text-[16px]">navigation</span>
+      </button>
+      <button id="btn-perspective-view" class="p-1.5 text-neutral-400 hover:text-white hover:bg-[#1E1E1E] rounded-lg transition-colors" title="Perspective Angle View">
+        <span class="material-symbols-outlined text-[16px]">view_in_ar</span>
+      </button>
+      <button id="btn-auto-rotate" class="p-1.5 text-neutral-400 hover:text-white hover:bg-[#1E1E1E] rounded-lg transition-colors" title="Toggle Auto Rotate">
+        <span class="material-symbols-outlined text-[16px]">sync</span>
+      </button>
+      <button id="btn-fullscreen" class="p-1.5 text-neutral-400 hover:text-white hover:bg-[#1E1E1E] rounded-lg transition-colors" title="Toggle Fullscreen">
+        <span class="material-symbols-outlined text-[16px]">fullscreen</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- WebGL LiDAR Viewport (#05070B Dark Background) -->
+  <div id="lidar-viewport-box" class="flex-1 relative bg-[#05070B] min-h-[460px] overflow-hidden select-none">
+    <!-- WebGL Canvas for 100k LiDAR Points -->
+    <canvas id="lidar-webgl-canvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+
+    <!-- Loading Animation Overlay -->
+    <div id="lidar-loader" class="absolute inset-0 z-40 bg-[#05070B]/95 backdrop-blur-md flex flex-col items-center justify-center transition-opacity duration-500">
+      <div class="relative w-16 h-16 mb-3 flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full border border-cyan-500/20 animate-ping"></div>
+        <div class="absolute inset-0 rounded-full border-2 border-t-cyan-400 border-r-transparent border-b-emerald-400 border-l-transparent animate-spin"></div>
+        <div class="w-7 h-7 rounded-full bg-cyan-950/80 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.4)]">
+          <span class="material-symbols-outlined text-cyan-400 text-[16px] animate-pulse">radar</span>
+        </div>
+      </div>
+      <div id="loader-status-text" class="text-xs font-mono font-semibold tracking-wider text-cyan-400 mb-1.5">
+        STREAMING VELODYNE HDL-64E DATA...
+      </div>
+      <div class="w-52 h-1.5 bg-[#162032] rounded-full overflow-hidden border border-[#252f44]">
+        <div id="loader-progress-bar" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 w-0 transition-all duration-300"></div>
+      </div>
+      <div id="loader-sub-text" class="text-[9px] font-mono text-neutral-400 mt-2">
+        CALIBRATING 64 CHANNELS • 100K PTS • SEMANTICKITTI
+      </div>
+    </div>
+
+    <!-- Top-Left Thin XYZ Axes / Coordinate HUD Badge -->
+    <div class="absolute top-3 left-3 z-20 flex items-center gap-2.5 bg-[#0a0f18]/85 backdrop-blur-md border border-[#1e293b]/70 rounded-xl px-2.5 py-1 text-[10px] font-mono text-neutral-400 shadow-lg pointer-events-none">
+      <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-red-500 rounded"></span>+X (Lat)</span>
+      <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-emerald-500 rounded"></span>+Y (Alt)</span>
+      <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-blue-500 rounded"></span>+Z (Lon)</span>
+    </div>
+
+    <!-- Top-Right: Camera Orientation Cube (ViewCube) & Zoom Controls -->
+    <div class="absolute top-3 right-3 z-20 flex items-start gap-2">
+      <!-- Zoom in / out buttons -->
+      <div class="flex flex-col gap-1 bg-[#0a0f18]/85 backdrop-blur-md border border-[#1e293b]/70 rounded-xl p-1 shadow-lg">
+        <button id="btn-zoom-in" class="p-1.5 text-neutral-400 hover:text-white hover:bg-[#1e293b] rounded-lg transition-colors" title="Zoom In">
+          <span class="material-symbols-outlined text-[16px]">add</span>
+        </button>
+        <button id="btn-zoom-out" class="p-1.5 text-neutral-400 hover:text-white hover:bg-[#1e293b] rounded-lg transition-colors" title="Zoom Out">
+          <span class="material-symbols-outlined text-[16px]">remove</span>
+        </button>
+      </div>
+
+      <!-- 3D Camera Orientation ViewCube -->
+      <div class="bg-[#0a0f18]/85 backdrop-blur-md border border-[#1e293b]/70 rounded-xl p-1 shadow-xl flex flex-col items-center">
+        <canvas id="lidar-viewcube-canvas" width="72" height="72" class="cursor-pointer rounded block" title="Interactive ViewCube: Click face to align view"></canvas>
+        <span class="text-[8px] font-mono text-neutral-500 mt-0.5">VIEWCUBE</span>
+      </div>
+    </div>
+
+    <!-- Hover Point Tooltip -->
+    <div id="lidar-point-tooltip" class="absolute pointer-events-none hidden z-30 bg-[#0c121e]/95 backdrop-blur-md border border-cyan-500/40 rounded-xl p-2.5 shadow-2xl text-[11px] font-mono text-neutral-200 min-w-[210px] transition-opacity duration-75">
+      <div class="flex items-center justify-between pb-1.5 border-b border-neutral-700/60 mb-1.5">
+        <span id="tooltip-class-badge" class="flex items-center gap-1.5 font-bold text-white px-2 py-0.5 rounded text-[10px] bg-neutral-800 border border-neutral-700">
+          <span id="tooltip-color-dot" class="w-2 h-2 rounded-full"></span>
+          <span id="tooltip-class-name">Vehicle</span>
+        </span>
+        <span id="tooltip-conf" class="text-emerald-400 font-semibold text-[10px]">99.4%</span>
+      </div>
+      <div class="space-y-1 text-[10px]">
+        <div class="flex justify-between text-neutral-400"><span>INSTANCE:</span><span id="tooltip-inst-id" class="text-white font-semibold">#VEH-01</span></div>
+        <div class="flex justify-between text-neutral-400"><span>DISTANCE:</span><span id="tooltip-distance" class="text-cyan-400 font-semibold">14.28 m</span></div>
+        <div class="flex justify-between text-neutral-400"><span>COORDS:</span><span id="tooltip-xyz" class="text-neutral-300">X: 1.82 Y: 0.74 Z: -13.9</span></div>
+      </div>
+    </div>
+
+    <!-- Bottom-Left Telemetry Overlay & Distance Scale Bar -->
+    <div class="absolute bottom-3 left-3 z-20 bg-[#0a0f18]/90 backdrop-blur-md border border-[#1e293b] rounded-xl px-3 py-2 text-[10px] font-mono text-neutral-300 shadow-xl pointer-events-none space-y-1.5 min-w-[240px]">
+      <div class="flex items-center justify-between gap-3">
+        <div>POINTS: <strong id="overlay-point-count" class="text-emerald-400">100,480</strong></div>
+        <div>FPS: <strong id="overlay-fps-counter" class="text-white">60.0</strong></div>
+        <div>FREQ: <strong class="text-cyan-400">10.0 Hz</strong></div>
+      </div>
+      <div class="flex items-center justify-between gap-3 text-neutral-400 pt-1 border-t border-neutral-800">
+        <div>FRAME: <strong id="overlay-frame-counter" class="text-neutral-200">#14289</strong></div>
+        <div>MODEL: <strong class="text-neutral-200">PointPillars-v4</strong></div>
+      </div>
+      <!-- Distance Scale Indicator -->
+      <div class="pt-1 border-t border-neutral-800 flex items-center justify-between text-[9px] text-neutral-400">
+        <span class="text-cyan-400 font-bold">SCALE:</span>
+        <div class="flex items-center gap-1 font-mono text-[9px]">
+          <span>0m</span>
+          <div class="w-12 h-1 bg-[#1e293b] rounded flex items-center px-0.5"><div class="w-full h-0.5 bg-cyan-500/70"></div></div>
+          <span>10m</span>
+          <div class="w-12 h-1 bg-[#1e293b] rounded flex items-center px-0.5"><div class="w-full h-0.5 bg-cyan-500/70"></div></div>
+          <span>50m</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom-Right SemanticKITTI Legend Overlay -->
+    <div class="absolute bottom-3 right-3 z-20 bg-[#0a0f18]/90 backdrop-blur-md border border-[#1e293b] rounded-xl p-2.5 shadow-xl max-w-[290px] w-auto">
+      <div class="text-[9px] font-mono text-neutral-400 uppercase tracking-wider mb-1.5 flex items-center justify-between px-1">
+        <span>SEMANTICKITTI LEGEND</span>
+        <button id="btn-legend-reset-filter" class="text-[9px] text-cyan-400 hover:text-white pointer-events-auto transition-colors cursor-pointer" title="Show all classes">RESET</button>
+      </div>
+      <div id="legend-pills-container" class="grid grid-cols-2 gap-1 text-[10px] font-mono select-none">
+        <!-- Injected via JavaScript with exact SemanticKITTI colors -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Class Filter Summary Bar -->
+  <div class="p-2.5 bg-[#141414] border-t border-[#1E1E1E] flex flex-wrap items-center gap-1.5 text-[10px] font-mono select-none overflow-x-auto">
+    <span class="text-neutral-500 mr-1 text-[9px] uppercase">ISOLATE:</span>
+    <button data-class-filter="all" class="filter-pill-btn px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-medium transition-colors">ALL</button>
+    <button data-class-filter="0" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#FF00FF]"></span>Road</button>
+    <button data-class-filter="1" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#6B21A8]"></span>Sidewalk</button>
+    <button data-class-filter="3" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#00FFFF]"></span>Building</button>
+    <button data-class-filter="4" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>Vegetation</button>
+    <button data-class-filter="2" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#65A30D]"></span>Terrain</button>
+    <button data-class-filter="5" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#F97316]"></span>Vehicle</button>
+    <button data-class-filter="6" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></span>Pedestrian</button>
+    <button data-class-filter="7" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#38BDF8]"></span>Pole</button>
+    <button data-class-filter="8" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#EAB308]"></span>Traffic Sign</button>
+    <button data-class-filter="9" class="filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-[#9CA3AF]"></span>Unknown</button>
+  </div>
+</div>
+
+<script>
+/**
+ * Production-Grade Semantic LiDAR Viewer Component
+ * Designed for SemanticKITTI Velodyne HDL-64E LiDAR visualization.
+ * Reusable architecture supporting dynamic backend frame streaming, WebSockets, and timeline playback.
+ */
+class SemanticLidarViewer {
+  constructor(options = {}) {
+    this.container = options.container || document.getElementById('lidar-viewport-box');
+    this.canvas = options.canvas || document.getElementById('lidar-webgl-canvas');
+    this.panelRoot = options.panelRoot || document.getElementById('lidar-panel-root');
+    this.apiEndpoint = options.apiEndpoint || '/api/v1/lidar';
+    this.currentFrame = options.initialFrame || 14289;
+    this.minFrame = 0;
+    this.maxFrame = 20000;
+    this.isPlaying = false;
+    this.playTimer = null;
+    this.activeFilterClass = null;
+
+    // SemanticKITTI Benchmark Color Palette
+    this.CLASSES = {
+      ROAD: 0,
+      SIDEWALK: 1,
+      TERRAIN: 2,
+      BUILDING: 3,
+      VEGETATION: 4,
+      VEHICLE: 5,
+      PEDESTRIAN: 6,
+      POLE: 7,
+      TRAFFIC_SIGN: 8,
+      UNKNOWN: 9
+    };
+
+    this.CLASS_INFO = [
+      { id: 0, name: 'Road', rgb: [1.0, 0.0, 1.0], hex: '#FF00FF', desc: 'Asphalt Roadway' },
+      { id: 1, name: 'Sidewalk', rgb: [0.42, 0.13, 0.66], hex: '#6B21A8', desc: 'Sidewalk & Curbs' },
+      { id: 2, name: 'Terrain', rgb: [0.40, 0.64, 0.05], hex: '#65A30D', desc: 'Grassy Verge' },
+      { id: 3, name: 'Building', rgb: [0.0, 1.0, 1.0], hex: '#00FFFF', desc: 'Urban Facade' },
+      { id: 4, name: 'Vegetation', rgb: [0.13, 0.77, 0.37], hex: '#16A34A', desc: 'Trees & Foliage' },
+      { id: 5, name: 'Vehicle', rgb: [0.98, 0.45, 0.09], hex: '#F97316', desc: 'Vehicles' },
+      { id: 6, name: 'Pedestrian', rgb: [0.94, 0.27, 0.27], hex: '#EF4444', desc: 'Pedestrians' },
+      { id: 7, name: 'Pole', rgb: [0.22, 0.74, 0.97], hex: '#38BDF8', desc: 'Street Poles' },
+      { id: 8, name: 'Traffic Sign', rgb: [0.92, 0.70, 0.03], hex: '#EAB308', desc: 'Traffic Signs' },
+      { id: 9, name: 'Unknown', rgb: [0.61, 0.64, 0.69], hex: '#9CA3AF', desc: 'Noise / Unlabeled' }
+    ];
+
+    this.INSTANCE_NAMES = {
+      1: '#ROAD-01',
+      2: '#SW-LEFT',
+      3: '#SW-RIGHT',
+      4: '#TER-LEFT',
+      5: '#TER-RIGHT',
+      10: '#BLD-01 (Storefront)',
+      11: '#BLD-02 (Office-Plaza)',
+      12: '#BLD-03 (Apartments)',
+      13: '#BLD-04 (Commercial)',
+      14: '#BLD-05 (Tower-Facade)',
+      15: '#BLD-06 (Retail-Plaza)',
+      20: '#TREE-01',
+      21: '#TREE-02',
+      22: '#TREE-03',
+      23: '#TREE-04',
+      24: '#TREE-05',
+      25: '#TREE-06',
+      26: '#TREE-07',
+      27: '#TREE-08',
+      28: '#HEDGE-01',
+      30: '#VEH-01 (Sedan-Lead)',
+      31: '#VEH-02 (SUV-Lead)',
+      32: '#VEH-03 (Oncoming-Sedan)',
+      33: '#VEH-04 (Parked-Sedan)',
+      34: '#VEH-05 (Parked-SUV)',
+      35: '#VEH-06 (Delivery-Van)',
+      40: '#PED-01 (Sidewalk-R)',
+      41: '#PED-02 (Crosswalk)',
+      42: '#PED-03 (Sidewalk-L1)',
+      43: '#PED-04 (Sidewalk-L2)',
+      50: '#POLE-01 (Streetlight)',
+      51: '#POLE-02 (Streetlight)',
+      52: '#POLE-03 (Mast-Arm)',
+      53: '#POLE-04 (Signal-Pole)',
+      60: '#SIGN-01 (Speed-Limit-45)',
+      61: '#SIGN-02 (Street-Name)',
+      62: '#SIGN-03 (Overhead-Guide)',
+      0: '#UNK-00 (Noise/Dust)'
+    };
+
+    // Camera animation state
+    this.animatingCam = false;
+    this.animStartPos = new THREE.Vector3();
+    this.animTargetPos = new THREE.Vector3();
+    this.animStartLook = new THREE.Vector3();
+    this.animTargetLook = new THREE.Vector3();
+    this.animStartTime = 0;
+    this.ANIM_DURATION = 650;
+
+    this.init();
+  }
+
+  showLoading(statusText = 'STREAMING VELODYNE HDL-64E DATA...') {
+    const loader = document.getElementById('lidar-loader');
+    const textEl = document.getElementById('loader-status-text');
+    const bar = document.getElementById('loader-progress-bar');
+    if (textEl) textEl.textContent = statusText;
+    if (bar) bar.style.width = '35%';
+    if (loader) {
+      loader.style.opacity = '1';
+      loader.style.pointerEvents = 'auto';
+    }
+  }
+
+  hideLoading() {
+    const loader = document.getElementById('lidar-loader');
+    const bar = document.getElementById('loader-progress-bar');
+    if (bar) bar.style.width = '100%';
+    setTimeout(() => {
+      if (loader) {
+        loader.style.opacity = '0';
+        loader.style.pointerEvents = 'none';
+      }
+    }, 280);
+  }
+
+  init() {
+    this.showLoading('INITIALIZING VELODYNE HDL-64E...');
+
+    // 1. Scene & Camera (#05070B background)
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x05070b);
+
+    const w = this.container.clientWidth || 800;
+    const h = this.container.clientHeight || 500;
+    this.camera = new THREE.PerspectiveCamera(54, w / h, 0.1, 400);
+    this.camera.position.set(0, 13.5, 22.0);
+
+    // 2. High-performance Antialiased WebGL Renderer
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas,
+      antialias: true,
+      powerPreference: 'high-performance',
+      alpha: false
+    });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.setSize(w, h, false);
+    this.renderer.setClearColor(0x05070b, 1.0);
+
+    // 3. OrbitControls
+    if (typeof THREE.OrbitControls !== 'undefined') {
+      this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.enableDamping = true;
+      this.controls.dampingFactor = 0.05;
+      this.controls.target.set(0, 1.2, -6.0);
+      this.controls.maxPolarAngle = Math.PI / 2 - 0.02;
+      this.controls.minDistance = 2.0;
+      this.controls.maxDistance = 160.0;
+    }
+
+    // 4. XYZ Axis Indicator (Thin RGB at sensor origin)
+    this.axesHelper = new THREE.AxesHelper(3.5);
+    this.axesHelper.position.set(0, 0.02, 0);
+    this.scene.add(this.axesHelper);
+
+    // 5. Distance Scale & Concentric Range Rings (10m, 20m, 30m, 40m, 50m)
+    this.createDistanceScale();
+
+    // 6. 3D Reticle on Hover
+    const reticleGeo = new THREE.RingGeometry(0.24, 0.32, 32);
+    const reticleMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.95 });
+    this.reticleMesh = new THREE.Mesh(reticleGeo, reticleMat);
+    this.reticleMesh.visible = false;
+    this.scene.add(this.reticleMesh);
+
+    // 7. Setup Point Cloud Geometry & Shader Material
+    this.setupPointCloud();
+
+    // 8. Setup Interactive Camera Orientation ViewCube
+    this.setupViewCube();
+
+    // 9. Setup Legend & Filter Controls
+    this.setupLegend();
+
+    // 10. Setup Viewer Toolbar & Playback Controls
+    this.setupControls();
+
+    // 11. Initial HDL-64E Frame Generation
+    this.loadFrame(this.currentFrame);
+
+    // 12. Start Render Loop
+    this.animate();
+
+    setTimeout(() => this.hideLoading(), 450);
+  }
+
+  createDistanceScale() {
+    this.distanceGroup = new THREE.Group();
+    const ringDistances = [10, 20, 30, 40, 50];
+    const segments = 128;
+
+    ringDistances.forEach(radius => {
+      // Ring circle geometry
+      const ringGeo = new THREE.BufferGeometry();
+      const ringPts = [];
+      for (let i = 0; i <= segments; i++) {
+        const theta = (i / segments) * Math.PI * 2;
+        ringPts.push(radius * Math.sin(theta), -0.01, radius * Math.cos(theta));
+      }
+      ringGeo.setAttribute('position', new THREE.Float32BufferAttribute(ringPts, 3));
+      const ringMat = new THREE.LineBasicMaterial({
+        color: 0x1e293b,
+        transparent: true,
+        opacity: radius === 50 ? 0.8 : 0.5
+      });
+      const ringLine = new THREE.Line(ringGeo, ringMat);
+      this.distanceGroup.add(ringLine);
+
+      // Distance Text Label Sprite at (0, 0.05, -radius)
+      const labelSprite = this.makeTextSprite(`${radius}m`);
+      labelSprite.position.set(0, 0.15, -radius);
+      this.distanceGroup.add(labelSprite);
+    });
+
+    // Crosshair axes radiating from sensor
+    const crossGeo = new THREE.BufferGeometry();
+    crossGeo.setAttribute('position', new THREE.Float32BufferAttribute([
+      -55, -0.01, 0,  55, -0.01, 0,
+      0, -0.01, -55, 0, -0.01, 45
+    ], 3));
+    const crossMat = new THREE.LineBasicMaterial({ color: 0x162032, transparent: true, opacity: 0.6 });
+    const crossLine = new THREE.LineSegments(crossGeo, crossMat);
+    this.distanceGroup.add(crossLine);
+
+    this.scene.add(this.distanceGroup);
+  }
+
+  makeTextSprite(text) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.font = 'bold 26px "JetBrains Mono", Inter, monospace';
+    ctx.fillStyle = '#06b6d4';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 64, 32);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.85 });
+    const sprite = new THREE.Sprite(spriteMat);
+    sprite.scale.set(3.2, 1.6, 1);
+    return sprite;
+  }
+
+  createPointTexture() {
+    const cv = document.createElement('canvas');
+    cv.width = 64; cv.height = 64;
+    const ctx = cv.getContext('2d');
+    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+    grad.addColorStop(0.55, 'rgba(255, 255, 255, 0.95)');
+    grad.addColorStop(0.85, 'rgba(255, 255, 255, 0.35)');
+    grad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(32, 32, 32, 0, Math.PI * 2);
+    ctx.fill();
+    return new THREE.CanvasTexture(cv);
+  }
+
+  setupPointCloud() {
+    this.geometry = new THREE.BufferGeometry();
+    this.material = new THREE.PointsMaterial({
+      size: 2.2,
+      vertexColors: true,
+      map: this.createPointTexture(),
+      transparent: true,
+      alphaTest: 0.05,
+      sizeAttenuation: true
+    });
+    this.pointsMesh = new THREE.Points(this.geometry, this.material);
+    this.scene.add(this.pointsMesh);
+  }
+
+  setupViewCube() {
+    this.cubeCanvas = document.getElementById('lidar-viewcube-canvas');
+    if (!this.cubeCanvas) return;
+
+    this.cubeRenderer = new THREE.WebGLRenderer({
+      canvas: this.cubeCanvas,
+      alpha: true,
+      antialias: true
+    });
+    this.cubeRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.cubeRenderer.setSize(72, 72);
+
+    this.cubeScene = new THREE.Scene();
+    this.cubeCamera = new THREE.OrthographicCamera(-1.8, 1.8, 1.8, -1.8, 0.1, 50);
+    this.cubeCamera.position.set(0, 0, 5);
+
+    const makeFace = (txt, color = '#38bdf8', bg = '#0f172a') => {
+      const c = document.createElement('canvas');
+      c.width = 128; c.height = 128;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 128, 128);
+      ctx.strokeStyle = '#252f44';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(4, 4, 120, 120);
+      ctx.font = 'bold 36px "JetBrains Mono", sans-serif';
+      ctx.fillStyle = color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(txt, 64, 64);
+      return new THREE.CanvasTexture(c);
+    };
+
+    const faceMats = [
+      new THREE.MeshBasicMaterial({ map: makeFace('RIGHT') }), // +X
+      new THREE.MeshBasicMaterial({ map: makeFace('LEFT') }),  // -X
+      new THREE.MeshBasicMaterial({ map: makeFace('TOP') }),   // +Y
+      new THREE.MeshBasicMaterial({ map: makeFace('BTM') }),   // -Y
+      new THREE.MeshBasicMaterial({ map: makeFace('BACK') }),  // +Z
+      new THREE.MeshBasicMaterial({ map: makeFace('FRONT') })  // -Z
+    ];
+
+    const cubeGeo = new THREE.BoxGeometry(2, 2, 2);
+    this.viewCubeMesh = new THREE.Mesh(cubeGeo, faceMats);
+    this.cubeScene.add(this.viewCubeMesh);
+
+    // Interactive clicking on ViewCube
+    this.cubeCanvas.addEventListener('click', (e) => {
+      const rect = this.cubeCanvas.getBoundingClientRect();
+      const cx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const cy = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      const ray = new THREE.Raycaster();
+      ray.setFromCamera(new THREE.Vector2(cx, cy), this.cubeCamera);
+      const hits = ray.intersectObject(this.viewCubeMesh);
+      if (hits.length > 0) {
+        const n = hits[0].face.normal.clone();
+        n.applyQuaternion(this.viewCubeMesh.quaternion);
+
+        if (n.y > 0.6) this.setTopView();
+        else if (n.z < -0.6) this.setFrontView();
+        else if (n.z > 0.6) this.setBackView();
+        else if (n.x > 0.6) this.setRightView();
+        else if (n.x < -0.6) this.setLeftView();
+        else this.resetCamera();
+      }
+    });
+  }
+
+  setupLegend() {
+    const legendContainer = document.getElementById('legend-pills-container');
+    if (!legendContainer) return;
+    legendContainer.innerHTML = '';
+
+    this.CLASS_INFO.forEach((ci) => {
+      const item = document.createElement('div');
+      item.className = 'legend-item flex items-center gap-1.5 px-1.5 py-1 rounded bg-[#161a24] hover:bg-[#202738] border border-[#252f44] cursor-pointer transition-all pointer-events-auto';
+      item.dataset.classId = ci.id;
+      item.title = `Click to isolate ${ci.name} (${ci.desc})`;
+      item.innerHTML = `
+        <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm" style="background-color: ${ci.hex}; border: 1px solid rgba(255,255,255,0.3);"></span>
+        <span class="truncate text-[10px] text-neutral-300 font-medium">${ci.name}</span>
+      `;
+      item.addEventListener('click', () => this.setClassFilter(ci.id));
+      legendContainer.appendChild(item);
+    });
+
+    const resetBtn = document.getElementById('btn-legend-reset-filter');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.setClassFilter(null);
+      });
+    }
+
+    // Bottom Filter Pills
+    document.querySelectorAll('.filter-pill-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.classFilter;
+        this.setClassFilter(f === 'all' ? null : parseInt(f, 10));
+      });
+    });
+  }
+
+  setClassFilter(targetClass) {
+    this.activeFilterClass = this.activeFilterClass === targetClass ? null : targetClass;
+
+    if (this.geometry && this.sceneData) {
+      const colAttr = this.geometry.attributes.color;
+      const colArr = colAttr.array;
+      const count = this.sceneData.count;
+
+      for (let i = 0; i < count; i++) {
+        const cId = this.sceneData.classIds[i];
+        const i3 = i * 3;
+        const base = this.CLASS_INFO[cId].rgb;
+        if (this.activeFilterClass === null || cId === this.activeFilterClass) {
+          const j = this.sceneData.jitters[i];
+          colArr[i3] = Math.min(1.0, base[0] * j);
+          colArr[i3 + 1] = Math.min(1.0, base[1] * j);
+          colArr[i3 + 2] = Math.min(1.0, base[2] * j);
+        } else {
+          // Dim non-selected points
+          colArr[i3] = base[0] * 0.10;
+          colArr[i3 + 1] = base[1] * 0.10;
+          colArr[i3 + 2] = base[2] * 0.10;
+        }
+      }
+      colAttr.needsUpdate = true;
+    }
+
+    // Update bottom filter buttons
+    document.querySelectorAll('.filter-pill-btn').forEach(btn => {
+      const f = btn.dataset.classFilter;
+      if (this.activeFilterClass === null) {
+        if (f === 'all') {
+          btn.className = 'filter-pill-btn px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-medium transition-colors';
+        } else {
+          btn.className = 'filter-pill-btn px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white flex items-center gap-1 transition-colors';
+        }
+      } else {
+        if (f === String(this.activeFilterClass)) {
+          btn.className = 'filter-pill-btn px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 font-bold flex items-center gap-1 transition-colors';
+        } else {
+          btn.className = 'filter-pill-btn px-2 py-0.5 rounded bg-[#141414] border border-[#1e1e1e] text-neutral-500 hover:text-neutral-300 flex items-center gap-1 transition-colors';
+        }
+      }
+    });
+
+    // Update legend items
+    document.querySelectorAll('.legend-item').forEach(item => {
+      const cid = parseInt(item.dataset.classId, 10);
+      if (this.activeFilterClass === null || this.activeFilterClass === cid) {
+        item.style.opacity = '1.0';
+        item.style.borderColor = this.activeFilterClass === cid ? '#38bdf8' : '#252f44';
+      } else {
+        item.style.opacity = '0.35';
+        item.style.borderColor = '#252f44';
+      }
+    });
+  }
+
+  setupControls() {
+    // Reset Camera
+    const btnReset = document.getElementById('btn-reset-cam');
+    if (btnReset) btnReset.addEventListener('click', () => this.resetCamera());
+
+    // Top View
+    const btnTop = document.getElementById('btn-top-view');
+    if (btnTop) btnTop.addEventListener('click', () => this.setTopView());
+
+    // Perspective View
+    const btnPersp = document.getElementById('btn-perspective-view');
+    if (btnPersp) btnPersp.addEventListener('click', () => this.setPerspectiveView());
+
+    // Auto Rotate
+    const btnAuto = document.getElementById('btn-auto-rotate');
+    let autoRotateActive = false;
+    if (btnAuto && this.controls) {
+      btnAuto.addEventListener('click', () => {
+        autoRotateActive = !autoRotateActive;
+        this.controls.autoRotate = autoRotateActive;
+        this.controls.autoRotateSpeed = 1.2;
+        btnAuto.className = autoRotateActive
+          ? 'p-1.5 text-cyan-400 bg-cyan-500/20 border border-cyan-500/40 rounded-lg transition-colors'
+          : 'p-1.5 text-neutral-400 hover:text-white hover:bg-[#1E1E1E] rounded-lg transition-colors';
+      });
+    }
+
+    // Zoom Buttons
+    const btnZoomIn = document.getElementById('btn-zoom-in');
+    if (btnZoomIn) {
+      btnZoomIn.addEventListener('click', () => {
+        this.camera.position.addScaledVector(this.camera.getWorldDirection(new THREE.Vector3()), 4.5);
+      });
+    }
+    const btnZoomOut = document.getElementById('btn-zoom-out');
+    if (btnZoomOut) {
+      btnZoomOut.addEventListener('click', () => {
+        this.camera.position.addScaledVector(this.camera.getWorldDirection(new THREE.Vector3()), -4.5);
+      });
+    }
+
+    // Fullscreen
+    const btnFull = document.getElementById('btn-fullscreen');
+    if (btnFull) {
+      btnFull.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          if (this.panelRoot.requestFullscreen) this.panelRoot.requestFullscreen();
+          else if (this.panelRoot.webkitRequestFullscreen) this.panelRoot.webkitRequestFullscreen();
+        } else {
+          if (document.exitFullscreen) document.exitFullscreen();
+        }
+      });
+      document.addEventListener('fullscreenchange', () => {
+        const isFull = !!document.fullscreenElement;
+        const icon = btnFull.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = isFull ? 'fullscreen_exit' : 'fullscreen';
+        setTimeout(() => this.onResize(), 60);
+      });
+    }
+
+    // Window Resize Observer
+    window.addEventListener('resize', () => this.onResize());
+    if (window.ResizeObserver) {
+      new ResizeObserver(() => this.onResize()).observe(this.container);
+    }
+
+    // Hover Tooltip Raycasting
+    this.raycaster = new THREE.Raycaster();
+    this.raycaster.params.Points.threshold = 0.38;
+    this.mouse = new THREE.Vector2(-999, -999);
+    this.lastClientX = 0; this.lastClientY = 0;
+    this.hasMouseMoved = false;
+
+    this.tooltipEl = document.getElementById('lidar-point-tooltip');
+    this.tipDot = document.getElementById('tooltip-color-dot');
+    this.tipName = document.getElementById('tooltip-class-name');
+    this.tipConf = document.getElementById('tooltip-conf');
+    this.tipInst = document.getElementById('tooltip-inst-id');
+    this.tipDist = document.getElementById('tooltip-distance');
+    this.tipXYZ = document.getElementById('tooltip-xyz');
+
+    this.canvas.addEventListener('pointermove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      this.lastClientX = e.clientX - rect.left;
+      this.lastClientY = e.clientY - rect.top;
+      this.hasMouseMoved = true;
+    });
+
+    this.canvas.addEventListener('pointerleave', () => {
+      this.mouse.x = -999; this.mouse.y = -999;
+      this.hasMouseMoved = false;
+      if (this.tooltipEl) this.tooltipEl.classList.add('hidden');
+      if (this.reticleMesh) this.reticleMesh.visible = false;
+    });
+
+    // Hook up Footer Playback Controls
+    this.setupFooterIntegration();
+  }
+
+  setupFooterIntegration() {
+    const footerPlayBtn = document.querySelector('footer button');
+    const footerButtons = document.querySelectorAll('footer button');
+    const footerStepBtn = footerButtons.length > 1 ? footerButtons[1] : null;
+    const footerSlider = document.querySelector('footer input[type="range"]');
+
+    if (footerPlayBtn) {
+      footerPlayBtn.addEventListener('click', () => {
+        this.togglePlay();
+        const icon = footerPlayBtn.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = this.isPlaying ? 'pause' : 'play_arrow';
+      });
+    }
+
+    if (footerStepBtn) {
+      footerStepBtn.addEventListener('click', () => {
+        this.nextFrame();
+      });
+    }
+
+    if (footerSlider) {
+      footerSlider.addEventListener('input', (e) => {
+        this.loadFrame(parseInt(e.target.value, 10));
+      });
+    }
+  }
+
+  play() {
+    if (this.isPlaying) return;
+    this.isPlaying = true;
+    this.playTimer = setInterval(() => {
+      this.nextFrame();
+    }, 100); // 10 Hz (Velodyne HDL-64E spin rate)
+  }
+
+  pause() {
+    this.isPlaying = false;
+    if (this.playTimer) clearInterval(this.playTimer);
+  }
+
+  togglePlay() {
+    if (this.isPlaying) this.pause();
+    else this.play();
+  }
+
+  nextFrame() {
+    let next = this.currentFrame + 1;
+    if (next > this.maxFrame) next = this.minFrame;
+    this.loadFrame(next);
+  }
+
+  prevFrame() {
+    let prev = this.currentFrame - 1;
+    if (prev < this.minFrame) prev = this.maxFrame;
+    this.loadFrame(prev);
+  }
+
+  /**
+   * Set raw point cloud buffers directly.
+   * Can be invoked by external fetch or WebSocket streams.
+   * @param {Object} bufferData
+   */
+  setPointCloudData(bufferData) {
+    const count = bufferData.count;
+    this.sceneData = bufferData;
+
+    this.geometry.setAttribute('position', new THREE.BufferAttribute(bufferData.positions, 3));
+    this.geometry.setAttribute('color', new THREE.BufferAttribute(bufferData.colors, 3));
+    this.geometry.attributes.position.needsUpdate = true;
+    this.geometry.attributes.color.needsUpdate = true;
+    this.geometry.computeBoundingSphere();
+
+    // Update UI telemetry
+    const countEl = document.getElementById('overlay-point-count');
+    if (countEl) countEl.textContent = count.toLocaleString() + ' pts';
+    const badgeEl = document.getElementById('header-pts-badge');
+    if (badgeEl) badgeEl.textContent = `${(count / 1000).toFixed(1)}K PTS`;
+  }
+
+  /**
+   * Loads a frame dynamically from backend or HDL-64E simulator.
+   * Designed to plug directly into a REST / WebSocket API.
+   * @param {number} frameId
+   */
+  async loadFrame(frameId) {
+    this.currentFrame = frameId;
+
+    // Update Frame displays across dashboard
+    const overlayFrame = document.getElementById('overlay-frame-counter');
+    if (overlayFrame) overlayFrame.textContent = `#${frameId}`;
+
+    const footerFrameEl = document.querySelector('footer strong');
+    if (footerFrameEl) footerFrameEl.textContent = `${frameId}`;
+
+    const footerSlider = document.querySelector('footer input[type="range"]');
+    if (footerSlider && footerSlider.value !== String(frameId)) {
+      footerSlider.value = frameId;
+    }
+
+    const headerFrameStrong = document.querySelector('header span:nth-child(2) strong');
+    if (headerFrameStrong) headerFrameStrong.textContent = `#${frameId}`;
+
+    // Generate or fetch high-fidelity Velodyne HDL-64E point cloud
+    const frameOffset = (frameId - 14289);
+    const data = this.generateHDL64EFrame(frameOffset);
+    this.setPointCloudData(data);
+  }
+
+  /**
+   * Asynchronous backend fetch contract.
+   * Call viewer.fetchFrameFromBackend('/api/v1/lidar/frame/14289') when connecting to real backend.
+   */
+  async fetchFrameFromBackend(urlOrFrameId) {
+    const url = typeof urlOrFrameId === 'number' ? `${this.apiEndpoint}/${urlOrFrameId}` : urlOrFrameId;
+    this.showLoading(`STREAMING DATA FROM ${url}...`);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      this.setPointCloudData({
+        positions: new Float32Array(data.positions),
+        colors: new Float32Array(data.colors),
+        classIds: new Uint8Array(data.classIds),
+        instanceIds: new Uint16Array(data.instanceIds),
+        confidences: new Float32Array(data.confidences),
+        jitters: new Float32Array(data.jitters || data.positions.length / 3),
+        count: data.positions.length / 3
+      });
+    } catch (err) {
+      console.warn("Backend fetch fallback:", err);
+      this.loadFrame(this.currentFrame);
+    } finally {
+      this.hideLoading();
+    }
+  }
+
+  /**
+   * Authentic Velodyne HDL-64E Simulator with Occlusion Raycasting & SemanticKITTI Palette
+   */
+  generateHDL64EFrame(frameOffset = 0) {
+    const maxPts = 130000;
+    const pos = new Float32Array(maxPts * 3);
+    const col = new Float32Array(maxPts * 3);
+    const cls = new Uint8Array(maxPts);
+    const inst = new Uint16Array(maxPts);
+    const conf = new Float32Array(maxPts);
+    const jitters = new Float32Array(maxPts);
+    let count = 0;
+
+    const addPt = (x, y, z, cId, iId, cVal, intensity = 1.0) => {
+      if (count >= maxPts) return;
+      const i3 = count * 3;
+      pos[i3] = x;
+      pos[i3 + 1] = y;
+      pos[i3 + 2] = z;
+
+      const j = Math.max(0.72, Math.min(1.15, intensity * (0.92 + Math.random() * 0.16)));
+      jitters[count] = j;
+      const base = this.CLASS_INFO[cId].rgb;
+      col[i3] = Math.min(1.0, base[0] * j);
+      col[i3 + 1] = Math.min(1.0, base[1] * j);
+      col[i3 + 2] = Math.min(1.0, base[2] * j);
+
+      cls[count] = cId;
+      inst[count] = iId;
+      conf[count] = cVal;
+      count++;
+    };
+
+    // Dynamic objects progression
+    const dt = frameOffset * 0.08;
+    const leadSedanZ = -13.5 - dt * 6.5;
+    const leadSUVZ = -25.0 - dt * 5.8;
+    const oncomingZ = -42.0 + dt * 7.2;
+    const pedCrossingX = 2.6 - dt * 0.6;
+
+    // Obstacles causing authentic ray shadowing
+    const obstacles = [
+      { minX: 0.8, maxX: 2.8, minZ: leadSedanZ - 2.4, maxZ: leadSedanZ + 2.4 },
+      { minX: -3.0, maxX: -1.0, minZ: leadSUVZ - 2.5, maxZ: leadSUVZ + 2.5 },
+      { minX: -3.2, maxX: -1.2, minZ: oncomingZ - 2.4, maxZ: oncomingZ + 2.4 },
+      { minX: 4.2, maxX: 6.2, minZ: -6.8, maxZ: -2.0 },
+      { minX: 4.2, maxX: 6.2, minZ: 12.5, maxZ: 17.5 },
+      { minX: -6.4, maxX: -4.0, minZ: 8.5, maxZ: 15.0 }
+    ];
+
+    const isOccluded = (gx, gz) => {
+      const dirX = gx, dirZ = gz;
+      const dist = Math.hypot(dirX, dirZ);
+      if (dist < 2.0) return false;
+
+      for (let i = 0; i < obstacles.length; i++) {
+        const ob = obstacles[i];
+        const midX = (ob.minX + ob.maxX) * 0.5;
+        const midZ = (ob.minZ + ob.maxZ) * 0.5;
+        const obDist = Math.hypot(midX, midZ);
+        if (obDist < dist - 0.5) {
+          if (gx >= ob.minX - 0.2 && gx <= ob.maxX + 0.2 && gz >= ob.minZ - 0.2 && gz <= ob.maxZ + 0.2) {
+            return true;
+          }
+          const shadowDist = dist - obDist;
+          if (shadowDist > 0 && shadowDist < 18.0) {
+            const t = obDist / dist;
+            const rx = dirX * t;
+            const rz = dirZ * t;
+            if (rx >= ob.minX && rx <= ob.maxX && rz >= ob.minZ && rz <= ob.maxZ) {
+              return true; // Occlusion shadow
+            }
+          }
+        }
+      }
+      return false;
+    };
+
+    // 1. Road points (~36,000 pts) - Velodyne 64 concentric laser rings (Magenta)
+    for (let ch = 0; ch < 64; ch++) {
+      const elevDeg = -24.8 + ch * (26.8 / 63);
+      if (elevDeg >= -0.5) continue;
+      const elevRad = (Math.abs(elevDeg) * Math.PI) / 180;
+      const dist = 1.73 / Math.tan(elevRad);
+      if (dist < 1.4 || dist > 58.0) continue;
+
+      const numPts = Math.floor(Math.min(3400, Math.max(280, dist * 122)));
+      for (let p = 0; p < numPts; p++) {
+        const phi = (p / numPts) * 2 * Math.PI;
+        const x = dist * Math.sin(phi) + (Math.random() - 0.5) * 0.025;
+        const z = dist * Math.cos(phi) + (Math.random() - 0.5) * 0.025;
+
+        if (Math.abs(x) <= 7.0 && z >= -55.0 && z <= 45.0) {
+          if (!isOccluded(x, z)) {
+            const crown = 0.025 * (1 - Math.pow(x / 7.0, 2));
+            const y = crown + (Math.random() - 0.5) * 0.015;
+            addPt(x, y, z, this.CLASSES.ROAD, 1, 0.988 + Math.random() * 0.010, 0.96);
+          }
+        }
+      }
+    }
+
+    // 2. Sidewalk points (~11,000 pts) - (Dark Purple)
+    for (let ch = 0; ch < 64; ch++) {
+      const elevDeg = -24.8 + ch * (26.8 / 63);
+      if (elevDeg >= -0.5) continue;
+      const elevRad = (Math.abs(elevDeg) * Math.PI) / 180;
+      const dist = (1.73 - 0.18) / Math.tan(elevRad);
+      if (dist < 1.4 || dist > 58.0) continue;
+
+      const numPts = Math.floor(Math.min(2600, Math.max(200, dist * 82)));
+      for (let p = 0; p < numPts; p++) {
+        const phi = (p / numPts) * 2 * Math.PI;
+        const x = dist * Math.sin(phi) + (Math.random() - 0.5) * 0.025;
+        const z = dist * Math.cos(phi) + (Math.random() - 0.5) * 0.025;
+
+        if (((x >= -10.5 && x <= -7.0) || (x >= 7.0 && x <= 10.5)) && z >= -55.0 && z <= 45.0) {
+          if (!isOccluded(x, z)) {
+            const isCurb = Math.abs(Math.abs(x) - 7.0) < 0.15;
+            const y = isCurb ? Math.random() * 0.18 : 0.18 + (Math.random() - 0.5) * 0.015;
+            addPt(x, y, z, this.CLASSES.SIDEWALK, x < 0 ? 2 : 3, 0.984 + Math.random() * 0.012, 0.88);
+          }
+        }
+      }
+    }
+    // Curb step vertical points
+    for (let z = -55.0; z <= 45.0; z += 0.12) {
+      for (const side of [-7.0, 7.0]) {
+        addPt(side + (Math.random() - 0.5) * 0.015, 0.06, z, this.CLASSES.SIDEWALK, side < 0 ? 2 : 3, 0.99, 0.9);
+        addPt(side + (Math.random() - 0.5) * 0.015, 0.12, z, this.CLASSES.SIDEWALK, side < 0 ? 2 : 3, 0.99, 0.9);
+        addPt(side + (Math.random() - 0.5) * 0.015, 0.18, z, this.CLASSES.SIDEWALK, side < 0 ? 2 : 3, 0.99, 0.9);
+      }
+    }
+
+    // 3. Terrain points (~11,000 pts) - (Olive Green)
+    for (let i = 0; i < 11000; i++) {
+      const side = Math.random() < 0.5 ? -1 : 1;
+      const x = side * (10.5 + Math.random() * 6.5);
+      const z = -55.0 + Math.random() * 100.0;
+      const y = 0.18 + 0.35 * Math.sin(x * 0.3) * Math.cos(z * 0.12) + 0.1 * Math.sin(z * 0.4) + (Math.random() - 0.5) * 0.03;
+      addPt(x, y, z, this.CLASSES.TERRAIN, side < 0 ? 4 : 5, 0.970 + Math.random() * 0.025, 0.82);
+    }
+
+    // 4. Building points (~26,000 pts) - Horizontal laser strike stripes (Cyan)
+    const buildings = [
+      { side: -1, zMin: -55.0, zMax: -24.0, xWall: -11.5, height: 14.0, id: 10, pts: 4200 },
+      { side: -1, zMin: -21.0, zMax: 6.0, xWall: -10.8, height: 18.0, id: 11, pts: 4800 },
+      { side: -1, zMin: 9.0, zMax: 45.0, xWall: -11.8, height: 15.0, id: 12, pts: 4500 },
+      { side: 1, zMin: -52.0, zMax: -18.0, xWall: 11.5, height: 13.0, id: 13, pts: 4000 },
+      { side: 1, zMin: -14.0, zMax: 18.0, xWall: 10.8, height: 22.0, id: 14, pts: 5500 },
+      { side: 1, zMin: 22.0, zMax: 45.0, xWall: 11.5, height: 10.0, id: 15, pts: 3200 }
+    ];
+    for (const bld of buildings) {
+      for (let i = 0; i < bld.pts; i++) {
+        const z = bld.zMin + Math.random() * (bld.zMax - bld.zMin);
+        const rawY = 0.18 + Math.random() * (bld.height - 0.18);
+        const y = Math.floor(rawY / 0.15) * 0.15 + (Math.random() - 0.5) * 0.02;
+        let recess = 0.0;
+        if (Math.floor(z * 1.2) % 3 === 0 && Math.floor(y * 1.0) % 2 === 0) {
+          recess = -0.3 * bld.side;
+        }
+        const x = bld.xWall + recess + (Math.random() - 0.5) * 0.03;
+        addPt(x, y, z, this.CLASSES.BUILDING, bld.id, 0.989 + Math.random() * 0.010, 0.95);
+      }
+    }
+
+    // 5. Vegetation points (~10,500 pts) - (Green)
+    const trees = [
+      { x: -8.8, z: -36.0, id: 20 },
+      { x: -8.8, z: -14.0, id: 21 },
+      { x: -8.8, z: 16.0, id: 22 },
+      { x: -8.8, z: 38.0, id: 23 },
+      { x: 8.8, z: -30.0, id: 24 },
+      { x: 8.8, z: -6.0, id: 25 },
+      { x: 8.8, z: 14.0, id: 26 },
+      { x: 8.8, z: 34.0, id: 27 }
+    ];
+    for (const tr of trees) {
+      for (let i = 0; i < 160; i++) {
+        const th = Math.random() * 2 * Math.PI;
+        const r = 0.12 + Math.random() * 0.10;
+        const y = 0.18 + Math.random() * 2.3;
+        addPt(tr.x + r * Math.cos(th), y, tr.z + r * Math.sin(th), this.CLASSES.VEGETATION, tr.id, 0.985, 0.8);
+      }
+      for (let i = 0; i < 1000; i++) {
+        const u = Math.random();
+        const costh = Math.random() * 2 - 1;
+        const sinth = Math.sqrt(1 - costh * costh);
+        const phi = Math.random() * 2 * Math.PI;
+        const r = Math.cbrt(u) * (1.8 + Math.random() * 0.8);
+        const px = tr.x + r * sinth * Math.cos(phi);
+        const pz = tr.z + r * sinth * Math.sin(phi);
+        const py = 4.2 + (r * costh) * 0.95 + (Math.random() - 0.5) * 0.06;
+        if (py > 2.0) {
+          addPt(px, py, pz, this.CLASSES.VEGETATION, tr.id, 0.975 + Math.random() * 0.02, 0.88);
+        }
+      }
+    }
+    for (let i = 0; i < 1200; i++) {
+      const side = Math.random() < 0.5 ? -10.0 : 10.0;
+      const hx = side + (Math.random() - 0.5) * 0.6;
+      const hz = -42.0 + Math.random() * 80.0;
+      const hy = 0.18 + Math.random() * 0.9;
+      addPt(hx, hy, hz, this.CLASSES.VEGETATION, 28, 0.98, 0.82);
+    }
+
+    // 6. Vehicles (~6,200 pts) - Pure point cloud reflections! (Orange)
+    const vehicles = [
+      { cx: 1.8, cz: leadSedanZ, head: 0, l: 4.6, w: 1.9, h: 1.5, id: 30, pts: 950 },
+      { cx: -2.0, cz: leadSUVZ, head: 0, l: 4.8, w: 2.0, h: 1.7, id: 31, pts: 900 },
+      { cx: -2.2, cz: oncomingZ, head: Math.PI, l: 4.5, w: 1.9, h: 1.45, id: 32, pts: 850 },
+      { cx: 5.2, cz: -4.5, head: 0, l: 4.4, w: 1.8, h: 1.4, id: 33, pts: 750 },
+      { cx: 5.2, cz: 15.0, head: 0, l: 4.7, w: 1.9, h: 1.65, id: 34, pts: 800 },
+      { cx: -5.2, cz: 11.5, head: 0, l: 6.2, w: 2.2, h: 2.6, id: 35, pts: 1100 }
+    ];
+    for (const v of vehicles) {
+      for (let i = 0; i < v.pts; i++) {
+        const surf = Math.random();
+        let lx = 0, ly = 0, lz = 0;
+        if (surf < 0.32) {
+          if (Math.random() < 0.55) {
+            lx = (Math.random() - 0.5) * v.w;
+            lz = (Math.random() - 0.5) * (v.l * 0.5);
+            ly = v.h;
+          } else {
+            lx = (Math.random() - 0.5) * v.w;
+            lz = -v.l * 0.25 - Math.random() * (v.l * 0.24);
+            ly = v.h * 0.65;
+          }
+        } else if (surf < 0.62) {
+          lx = (Math.random() < 0.5 ? -1 : 1) * (v.w / 2);
+          lz = (Math.random() - 0.5) * v.l;
+          ly = 0.2 + Math.random() * (v.h * (lz < -v.l * 0.2 ? 0.65 : 1.0) - 0.2);
+        } else if (surf < 0.86) {
+          lz = (Math.random() < 0.5 ? -1 : 1) * (v.l / 2);
+          lx = (Math.random() - 0.5) * v.w;
+          ly = 0.2 + Math.random() * (v.h * 0.7 - 0.2);
+        } else {
+          lx = (Math.random() < 0.5 ? -1 : 1) * (v.w * 0.45);
+          lz = (Math.random() < 0.5 ? -1 : 1) * (v.l * 0.35) + (Math.random() - 0.5) * 0.15;
+          ly = 0.05 + Math.random() * 0.4;
+        }
+        const gx = v.cx + lx * Math.cos(v.head) - lz * Math.sin(v.head) + (Math.random() - 0.5) * 0.02;
+        const gz = v.cz + lx * Math.sin(v.head) + lz * Math.cos(v.head) + (Math.random() - 0.5) * 0.02;
+        const gy = Math.floor(ly / 0.08) * 0.08 + (Math.random() - 0.5) * 0.015;
+        addPt(gx, gy, gz, this.CLASSES.VEHICLE, v.id, 0.992 + Math.random() * 0.007, 1.05);
+      }
+    }
+
+    // 7. Pedestrians (~1,400 pts) - (Red)
+    const pedestrians = [
+      { px: 8.6, pz: -6.5, id: 40 },
+      { px: pedCrossingX, pz: -18.5, id: 41 },
+      { px: -8.5, pz: 7.5, id: 42 },
+      { px: -8.1, pz: 8.2, id: 43 }
+    ];
+    for (const ped of pedestrians) {
+      const baseY = Math.abs(ped.px) < 7.0 ? 0.0 : 0.18;
+      for (let i = 0; i < 350; i++) {
+        const part = Math.random();
+        let x = ped.px, y = baseY, z = ped.pz;
+        if (part < 0.35) {
+          x += (Math.random() < 0.5 ? -0.12 : 0.12) + (Math.random() - 0.5) * 0.06;
+          y += Math.random() * 0.8;
+          z += (Math.random() - 0.5) * 0.06;
+        } else if (part < 0.80) {
+          x += (Math.random() - 0.5) * 0.28;
+          y += 0.8 + Math.random() * 0.65;
+          z += (Math.random() - 0.5) * 0.18;
+        } else {
+          x += (Math.random() - 0.5) * 0.16;
+          y += 1.45 + Math.random() * 0.30;
+          z += (Math.random() - 0.5) * 0.16;
+        }
+        addPt(x, y, z, this.CLASSES.PEDESTRIAN, ped.id, 0.982 + Math.random() * 0.016, 0.95);
+      }
+    }
+
+    // 8. Poles (~1,300 pts) - (Sky Blue)
+    const poles = [
+      { plx: 7.1, plz: -24.0, id: 50 },
+      { plx: 7.1, plz: 10.0, id: 51 },
+      { plx: -7.1, plz: -16.0, id: 52 },
+      { plx: -7.1, plz: 28.0, id: 53 }
+    ];
+    for (const pl of poles) {
+      for (let i = 0; i < 260; i++) {
+        const y = 0.18 + Math.random() * 6.0;
+        const th = Math.random() * 2 * Math.PI;
+        const r = 0.08 + (Math.random() - 0.5) * 0.01;
+        addPt(pl.plx + r * Math.cos(th), y, pl.plz + r * Math.sin(th), this.CLASSES.POLE, pl.id, 0.990, 0.95);
+      }
+      for (let i = 0; i < 80; i++) {
+        const reach = Math.random() * 2.8;
+        const armX = pl.plx > 0 ? pl.plx - reach : pl.plx + reach;
+        const armY = 6.18 - reach * 0.14 + (Math.random() - 0.5) * 0.03;
+        addPt(armX, armY, pl.plz + (Math.random() - 0.5) * 0.03, this.CLASSES.POLE, pl.id, 0.985, 0.95);
+      }
+    }
+
+    // 9. Traffic Signs (~630 pts) - (Yellow)
+    const signs = [
+      { sx: 7.1, sy: 3.2, sz: -24.0, sw: 0.7, sh: 0.7, id: 60 },
+      { sx: -7.1, sy: 3.4, sz: -16.0, sw: 0.9, sh: 0.4, id: 61 },
+      { sx: 4.5, sy: 5.8, sz: -16.0, sw: 1.2, sh: 0.8, id: 62 }
+    ];
+    for (const s of signs) {
+      for (let i = 0; i < 210; i++) {
+        const lx = (Math.random() - 0.5) * s.sw;
+        const ly = (Math.random() - 0.5) * s.sh;
+        addPt(s.sx + lx, s.sy + ly, s.sz + (Math.random() - 0.5) * 0.02, this.CLASSES.TRAFFIC_SIGN, s.id, 0.988, 1.1);
+      }
+    }
+
+    // 10. Unknown / Noise (~350 pts) - (Gray)
+    for (let i = 0; i < 350; i++) {
+      const ux = (Math.random() - 0.5) * 45;
+      const uz = -55.0 + Math.random() * 100;
+      const uy = Math.random() * 12;
+      addPt(ux, uy, uz, this.CLASSES.UNKNOWN, 0, 0.55 + Math.random() * 0.35, 0.65);
+    }
+
+    return {
+      count,
+      positions: pos.subarray(0, count * 3),
+      colors: col.subarray(0, count * 3),
+      classIds: cls.subarray(0, count),
+      instanceIds: inst.subarray(0, count),
+      confidences: conf.subarray(0, count),
+      jitters: jitters.subarray(0, count)
+    };
+  }
+
+  smoothlyTransitionCamera(targetPos, targetLook) {
+    this.animStartPos.copy(this.camera.position);
+    this.animTargetPos.copy(targetPos);
+    if (this.controls) this.animStartLook.copy(this.controls.target);
+    else this.animStartLook.set(0, 0, 0);
+    this.animTargetLook.copy(targetLook);
+    this.animStartTime = performance.now();
+    this.animatingCam = true;
+  }
+
+  resetCamera() {
+    this.smoothlyTransitionCamera(new THREE.Vector3(0, 13.5, 22.0), new THREE.Vector3(0, 1.2, -6.0));
+  }
+
+  setTopView() {
+    this.smoothlyTransitionCamera(new THREE.Vector3(0, 62.0, -5.0), new THREE.Vector3(0, 0, -5.0));
+  }
+
+  setPerspectiveView() {
+    this.smoothlyTransitionCamera(new THREE.Vector3(-14.0, 10.0, 14.0), new THREE.Vector3(0, 1.0, -8.0));
+  }
+
+  setFrontView() {
+    this.smoothlyTransitionCamera(new THREE.Vector3(0, 3.5, 26.0), new THREE.Vector3(0, 1.0, -10.0));
+  }
+
+  setBackView() {
+    this.smoothlyTransitionCamera(new THREE.Vector3(0, 3.5, -36.0), new THREE.Vector3(0, 1.0, 0.0));
+  }
+
+  setRightView() {
+    this.smoothlyTransitionCamera(new THREE.Vector3(30.0, 4.0, -6.0), new THREE.Vector3(0, 1.0, -6.0));
+  }
+
+  setLeftView() {
+    this.smoothlyTransitionCamera(new THREE.Vector3(-30.0, 4.0, -6.0), new THREE.Vector3(0, 1.0, -6.0));
+  }
+
+  onResize() {
+    const w = this.container.clientWidth;
+    const h = this.container.clientHeight;
+    if (w === 0 || h === 0) return;
+    this.camera.aspect = w / h;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(w, h, false);
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
+
+    // Camera animation transition
+    if (this.animatingCam) {
+      const elapsed = performance.now() - this.animStartTime;
+      const progress = Math.min(1.0, elapsed / this.ANIM_DURATION);
+      const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      this.camera.position.lerpVectors(this.animStartPos, this.animTargetPos, ease);
+      if (this.controls) this.controls.target.lerpVectors(this.animStartLook, this.animTargetLook, ease);
+      if (progress >= 1.0) this.animatingCam = false;
+    }
+
+    if (this.controls) this.controls.update();
+
+    // Synchronize ViewCube orientation with main camera
+    if (this.viewCubeMesh && this.cubeRenderer) {
+      this.viewCubeMesh.quaternion.copy(this.camera.quaternion).invert();
+      this.cubeRenderer.render(this.cubeScene, this.cubeCamera);
+    }
+
+    // Raycast on hover
+    if (this.hasMouseMoved && this.mouse.x > -2 && this.pointsMesh) {
+      this.hasMouseMoved = false;
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+      const hits = this.raycaster.intersectObject(this.pointsMesh);
+      if (hits.length > 0) {
+        const hit = hits[0];
+        const idx = hit.index;
+        const posArr = this.sceneData.positions;
+        const px = posArr[idx * 3];
+        const py = posArr[idx * 3 + 1];
+        const pz = posArr[idx * 3 + 2];
+        const cId = this.sceneData.classIds[idx];
+        const iId = this.sceneData.instanceIds[idx];
+        const cVal = this.sceneData.confidences[idx];
+        const dist = Math.hypot(px, py, pz);
+
+        const ci = this.CLASS_INFO[cId];
+        if (this.tipDot) this.tipDot.style.backgroundColor = ci.hex;
+        if (this.tipName) this.tipName.textContent = ci.name;
+        if (this.tipConf) this.tipConf.textContent = `${(cVal * 100).toFixed(1)}%`;
+        if (this.tipInst) this.tipInst.textContent = this.INSTANCE_NAMES[iId] || `#OBJ-${iId}`;
+        if (this.tipDist) this.tipDist.textContent = `${dist.toFixed(2)} m`;
+        if (this.tipXYZ) this.tipXYZ.textContent = `X: ${px.toFixed(2)} Y: ${py.toFixed(2)} Z: ${pz.toFixed(2)}`;
+
+        if (this.tooltipEl) {
+          this.tooltipEl.classList.remove('hidden');
+          const boxW = this.container.clientWidth;
+          const boxH = this.container.clientHeight;
+          let tipX = this.lastClientX + 16;
+          let tipY = this.lastClientY - 20;
+          if (tipX + 220 > boxW) tipX = this.lastClientX - 225;
+          if (tipY + 110 > boxH) tipY = boxH - 115;
+          if (tipY < 10) tipY = 10;
+          this.tooltipEl.style.left = `${tipX}px`;
+          this.tooltipEl.style.top = `${tipY}px`;
+        }
+
+        if (this.reticleMesh) {
+          this.reticleMesh.position.set(px, py, pz);
+          this.reticleMesh.quaternion.copy(this.camera.quaternion);
+          this.reticleMesh.visible = true;
+        }
+      } else {
+        if (this.tooltipEl) this.tooltipEl.classList.add('hidden');
+        if (this.reticleMesh) this.reticleMesh.visible = false;
+      }
+    }
+
+    // Telemetry FPS counter
+    this.frameCount = (this.frameCount || 0) + 1;
+    const now = performance.now();
+    this.lastTime = this.lastTime || now;
+    if (now - this.lastTime >= 500) {
+      const fps = ((this.frameCount * 1000) / (now - this.lastTime)).toFixed(1);
+      const fpsEl = document.getElementById('overlay-fps-counter');
+      if (fpsEl) fpsEl.textContent = fps;
+      this.frameCount = 0;
+      this.lastTime = now;
+    }
+
+    this.renderer.render(this.scene, this.camera);
+  }
+}
+
+// Global Reusable Instance Initialization
+function initSemanticLidarViewer() {
+  if (typeof THREE === 'undefined') {
+    setTimeout(initSemanticLidarViewer, 50);
+    return;
+  }
+  window.semanticLidarViewer = new SemanticLidarViewer();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSemanticLidarViewer);
+} else {
+  initSemanticLidarViewer();
+}
+</script><div id="occupancy-panel-root" class="col-span-5 bg-[#101010] border border-[#1E1E1E] rounded-2xl flex flex-col overflow-hidden shadow-2xl relative transition-all duration-300">
+  <!-- Panel Header -->
+  <div class="px-4 py-3 bg-[#141414] border-b border-[#1E1E1E] flex items-center justify-between select-none z-10">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-cyan-400 text-[18px]">radar</span>
+      <span class="font-bold text-xs tracking-wider text-white">ADAPTIVE 2.5D GRID &amp; HAZARD ANALYSIS</span>
+      <span class="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] text-cyan-400 font-mono font-medium flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+        EQUATION: 0.20 + 0.03r
+      </span>
+      <span class="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-[10px] text-amber-400 font-mono font-medium flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+        5s PREDICTION
+      </span>
+      <button id="btn-backend-sync" class="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-400 font-mono font-medium flex items-center gap-1.5 hover:bg-emerald-500/20 transition-colors" title="Click to fetch live FastAPI backend data or run inference pipeline">
+        <span id="backend-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="backend-status-text">BACKEND: FASTAPI CONNECTED</span>
+      </button>
+    </div>
+    <div class="flex items-center gap-2 text-[11px] font-mono">
+      <span class="text-neutral-400">TRACKED: <strong class="text-emerald-400" id="hdr-tracked-count">13</strong></span>
+      <span id="hdr-risk-badge" class="text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+        RISK: MEDIUM
+      </span>
+      <div class="flex items-center gap-1 pl-2 border-l border-[#262626]">
+        <button id="btn-grid-reset" class="p-1 text-neutral-400 hover:text-white hover:bg-[#1E1E1E] rounded transition-colors" title="Center on Ego Vehicle">
+          <span class="material-symbols-outlined text-[15px]">my_location</span>
+        </button>
+        <button id="btn-grid-zoom-in" class="p-1 text-neutral-400 hover:text-white hover:bg-[#1E1E1E] rounded transition-colors" title="Zoom In">
+          <span class="material-symbols-outlined text-[15px]">add</span>
+        </button>
+        <button id="btn-grid-zoom-out" class="p-1 text-neutral-400 hover:text-white hover:bg-[#1E1E1E] rounded transition-colors" title="Zoom Out">
+          <span class="material-symbols-outlined text-[15px]">remove</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Statistics HUD Bar -->
+  <div class="px-4 py-2 bg-[#0d131d] border-b border-[#1E1E1E] grid grid-cols-6 gap-2 text-[10px] font-mono select-none z-10">
+    <div class="bg-[#121927] px-2 py-1 rounded border border-[#1e293b]">
+      <div class="text-neutral-500 text-[9px]">MIN CELL SIZE</div>
+      <div id="stat-min-size" class="text-cyan-400 font-bold">0.20 m</div>
+    </div>
+    <div class="bg-[#121927] px-2 py-1 rounded border border-[#1e293b]">
+      <div class="text-neutral-500 text-[9px]">MAX CELL SIZE</div>
+      <div id="stat-max-size" class="text-amber-400 font-bold">1.76 m</div>
+    </div>
+    <div class="bg-[#121927] px-2 py-1 rounded border border-[#1e293b]">
+      <div class="text-neutral-500 text-[9px]">AVG CELL SIZE</div>
+      <div id="stat-avg-size" class="text-white font-bold">0.60 m</div>
+    </div>
+    <div class="bg-[#121927] px-2 py-1 rounded border border-[#1e293b]">
+      <div class="text-neutral-500 text-[9px]">ADAPTIVE CELLS</div>
+      <div id="stat-num-cells" class="text-emerald-400 font-bold">5,395</div>
+    </div>
+    <div class="bg-[#121927] px-2 py-1 rounded border border-[#1e293b]">
+      <div class="text-neutral-500 text-[9px]">OCCUPANCY RATIO</div>
+      <div id="stat-occ-ratio" class="text-purple-400 font-bold">46.4%</div>
+    </div>
+    <div class="bg-[#121927] px-2 py-1 rounded border border-[#1e293b]">
+      <div class="text-neutral-500 text-[9px]">RES REDUCTION</div>
+      <div id="stat-red-pct" class="text-emerald-400 font-bold">-90.9%</div>
+    </div>
+  </div>
+
+  <!-- Canvas Viewport -->
+  <div id="occupancy-viewport-box" class="relative flex-1 bg-[#05070B] min-h-[440px] overflow-hidden select-none cursor-grab active:cursor-grabbing">
+    <canvas id="occupancy-grid-canvas" class="w-full h-full block"></canvas>
+
+    <!-- Top-Left HUD -->
+    <div class="absolute top-3 left-3 bg-[#0a0f18]/92 backdrop-blur-md border border-[#1E1E1E] p-2.5 rounded-xl text-xs space-y-1 z-20 shadow-xl pointer-events-none min-w-[220px]">
+      <div class="text-cyan-400 font-bold flex items-center justify-between text-[11px]">
+        <span class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[14px]">conversion_path</span>
+          PREDICTION_ENGINE
+        </span>
+        <span class="text-[9px] text-amber-400 font-mono font-semibold">5.0s HORIZON</span>
+      </div>
+      <div class="text-neutral-400 font-mono text-[9.5px] space-y-0.5">
+        <div>HORIZONS: <strong class="text-amber-300">0.5 / 1.0 / 2.0 / 3.0 / 5.0 s</strong></div>
+        <div>RISK MODEL: <strong class="text-red-300">TTC + CPA + Future Occ</strong></div>
+        <div>EQUATION: <span class="text-purple-300 font-semibold">0.20m + 0.03&times;r</span></div>
+      </div>
+    </div>
+
+    <!-- Top-Right Layer Toggles -->
+    <div class="absolute top-3 right-3 flex items-center gap-1 bg-[#0a0f18]/85 backdrop-blur-md border border-[#1E1E1E] p-1 rounded-xl text-[10px] font-mono z-20 shadow-xl">
+      <button id="toggle-layer-pred" class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 transition-colors" title="Toggle 5s Prediction Trajectories">PREDICT</button>
+      <button id="toggle-layer-risk" class="px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/40 transition-colors" title="Toggle Risk Zones &amp; TTC">RISK</button>
+      <button id="toggle-layer-focc" class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/40 transition-colors" title="Toggle Future Occupancy Heatmap">FUT_OCC</button>
+      <button id="toggle-layer-radar" class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 transition-colors" title="Toggle Radar Range Rings">RADAR</button>
+    </div>
+
+    <!-- Hover Tooltip -->
+    <div id="grid-cell-tooltip" class="absolute pointer-events-none hidden z-30 bg-[#0c121e]/95 backdrop-blur-md border border-cyan-500/50 rounded-xl p-3 shadow-2xl text-[11px] font-mono text-neutral-200 min-w-[270px] transition-opacity duration-75">
+      <div class="flex items-center justify-between pb-1.5 border-b border-neutral-700/60 mb-2">
+        <span id="cell-tip-class-badge" class="flex items-center gap-1.5 font-bold text-white px-2 py-0.5 rounded text-[10px] bg-neutral-800 border border-neutral-700">
+          <span id="cell-tip-dot" class="w-2 h-2 rounded-full"></span>
+          <span id="cell-tip-class">Vehicle #021</span>
+        </span>
+        <span id="cell-tip-conf" class="text-emerald-400 font-semibold text-[10px]">99.5% CONF</span>
+      </div>
+      <div class="space-y-1.5 text-[10px]">
+        <div class="flex justify-between text-neutral-400"><span>INSTANCE ID:</span><span id="cell-tip-id" class="text-cyan-300 font-bold">Vehicle #021</span></div>
+        <div class="flex justify-between text-neutral-400"><span>VELOCITY:</span><span id="cell-tip-vel" class="text-emerald-400 font-bold">11.8 m/s</span></div>
+        <div class="flex justify-between text-neutral-400"><span>HEADING:</span><span id="cell-tip-heading" class="text-white font-semibold">0.0&deg;</span></div>
+        <div class="flex justify-between text-neutral-400"><span>ACCELERATION:</span><span id="cell-tip-accel" class="text-amber-400 font-semibold">-0.35 m/s&sup2;</span></div>
+        <div class="flex justify-between text-neutral-400"><span>TRACKING AGE:</span><span id="cell-tip-age" class="text-white font-semibold">142 frames</span></div>
+        <div class="flex justify-between text-neutral-400"><span>PRED HORIZON:</span><span id="cell-tip-horizon" class="text-amber-400 font-semibold">5.0s</span></div>
+        <div class="flex justify-between text-neutral-400 border-t border-neutral-800/80 pt-1"><span>TTC / CPA:</span><span id="cell-tip-ttc" class="text-red-400 font-bold">2.8s / 3.2m</span></div>
+        <div class="flex justify-between text-neutral-400"><span>RISK LEVEL:</span><span id="cell-tip-risk" class="text-amber-400 font-bold">ATTENTION</span></div>
+        <div class="flex justify-between text-neutral-400 border-t border-neutral-800/80 pt-1"><span>DISTANCE:</span><span id="cell-tip-dist" class="text-neutral-300">14.28 m</span></div>
+        <div class="flex justify-between text-neutral-400"><span>CELL SIZE:</span><span id="cell-tip-size" class="text-neutral-300">0.628 m</span></div>
+        <div class="flex justify-between text-neutral-400"><span>ELEVATION:</span><span id="cell-tip-height" class="text-white font-semibold">+1.55 m</span></div>
+        <div class="flex justify-between text-neutral-400"><span>OCCUPANCY:</span><span id="cell-tip-occ" class="text-purple-400 font-bold">98.5%</span></div>
+        <div class="flex justify-between text-neutral-400"><span>HAZARD:</span><span id="cell-tip-hazard" class="text-red-400 font-bold">94.2%</span></div>
+      </div>
+    </div>
+
+    <!-- Bottom Right Legend -->
+    <div class="absolute bottom-3 right-3 z-20 bg-[#0a0f18]/92 backdrop-blur-md border border-[#1e293b] rounded-xl p-2.5 shadow-xl text-[9px] font-mono space-y-1.5 max-w-[370px]">
+      <div class="pb-1 border-b border-neutral-800 space-y-1">
+        <div class="flex items-center justify-between text-[8.5px]">
+          <span class="text-neutral-400 uppercase font-bold">RISK COLOR CODE:</span>
+        </div>
+        <div class="flex items-center gap-3 text-[8.5px]">
+          <span class="flex items-center gap-1 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Safe</span>
+          <span class="flex items-center gap-1 text-yellow-400"><span class="w-2 h-2 rounded-full bg-yellow-400"></span>Attention</span>
+          <span class="flex items-center gap-1 text-orange-400"><span class="w-2 h-2 rounded-full bg-orange-400"></span>Conflict</span>
+          <span class="flex items-center gap-1 text-red-400"><span class="w-2 h-2 rounded-full bg-red-500"></span>Collision</span>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-1.5 pt-0.5 text-[8.5px]">
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#FF00FF]"></span>Road</span>
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#00FFFF]"></span>Building</span>
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#F97316]"></span>Vehicle</span>
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#EF4444]"></span>Ped</span>
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#A855F7]"></span>Cyclist</span>
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#38BDF8]"></span>Pole</span>
+      </div>
+    </div>
+
+    <!-- Bottom Left Status -->
+    <div class="absolute bottom-3 left-3 z-20 bg-[#0a0f18]/90 backdrop-blur-md border border-[#1e293b] rounded-xl px-3 py-1.5 text-[9px] font-mono text-neutral-400 shadow-xl pointer-events-none flex items-center gap-2">
+      <span class="text-cyan-400 font-bold flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+        LIDAR:
+      </span>
+      <span class="text-white">(0,0)</span>
+      <span class="text-neutral-600">|</span>
+      <span>TTC: <strong id="bl-ttc" class="text-amber-400">2.8s</strong></span>
+      <span class="text-neutral-600">|</span>
+      <span>CPA: <strong id="bl-cpa" class="text-cyan-400">3.2m</strong></span>
+    </div>
+  </div>
+</div>
+
+<script>
+class TrueAdaptiveOccupancyGrid {
+  constructor(opt = {}) {
+    this.container = opt.container || document.getElementById('occupancy-viewport-box');
+    this.canvas = opt.canvas || document.getElementById('occupancy-grid-canvas');
+    this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
+    this.currentFrame = opt.initialFrame || 14289;
+    this.showPredictions = true;
+    this.showRisk = true;
+    this.showFutureOcc = true;
+    this.showRadar = true;
+    this.scale = 11.5;
+    this.panX = 0;
+    this.panY = 70;
+    this.isDragging = false;
+    this.dragStartX = 0;
+    this.dragStartY = 0;
+    this.animTime = 0;
+    this.activeCells = [];
+    this.trackedObjects = [];
+    this.trajectory = [];
+    this.rings = [];
+    this.riskInteractions = [];
+    this.selectedObjectId = null;
+    this.hoveredCell = null;
+    this.mouseX = -999;
+    this.mouseY = -999;
+
+    this.CLASSES = {
+      ROAD:         { name: 'Road', hex: '#FF00FF', rgb: [255,0,255], traversable: true },
+      SIDEWALK:     { name: 'Sidewalk', hex: '#6B21A8', rgb: [107,33,168], traversable: false },
+      BUILDING:     { name: 'Building', hex: '#00FFFF', rgb: [0,255,255], traversable: false },
+      VEGETATION:   { name: 'Vegetation', hex: '#16A34A', rgb: [22,163,74], traversable: false },
+      TERRAIN:      { name: 'Terrain', hex: '#65A30D', rgb: [101,163,13], traversable: false },
+      VEHICLE:      { name: 'Vehicle', hex: '#F97316', rgb: [249,115,22], trajHex: '#F97316', traversable: false },
+      PEDESTRIAN:   { name: 'Pedestrian', hex: '#EF4444', rgb: [239,68,68], trajHex: '#EF4444', traversable: false },
+      CYCLIST:      { name: 'Cyclist', hex: '#A855F7', rgb: [168,85,247], trajHex: '#A855F7', traversable: false },
+      POLE:         { name: 'Pole', hex: '#38BDF8', rgb: [56,189,248], traversable: false },
+      TRAFFIC_SIGN: { name: 'Traffic Sign', hex: '#EAB308', rgb: [234,179,8], traversable: false },
+      UNKNOWN:      { name: 'Unknown', hex: '#4B5563', rgb: [75,85,99], traversable: false }
+    };
+
+    this.RISK_COLORS = {
+      SAFE:     { label: 'Safe',     hex: '#22C55E', rgb: [34,197,94] },
+      ATTENTION:{ label: 'Attention',hex: '#EAB308', rgb: [234,179,8] },
+      CONFLICT: { label: 'Conflict', hex: '#F97316', rgb: [249,115,22] },
+      COLLISION:{ label: 'Collision',hex: '#EF4444', rgb: [239,68,68] }
+    };
+
+    this.HORIZONS = [0.5, 1.0, 2.0, 3.0, 5.0];
+    this.backendApiUrl = '';  // Use relative URLs — FastAPI serves this page
+    this.isBackendConnected = false;
+
+    this.init();
+    this.checkAndFetchBackend();
+  }
+
+  init() {
+    if (!this.canvas || !this.ctx) return;
+    this.setupEvents();
+    this.resizeCanvas();
+    this.loadFrame(this.currentFrame, true);
+    this.startRenderLoop();
+  }
+
+  // ── FASTAPI BACKEND INTEGRATION ──
+  async checkAndFetchBackend() {
+    const dot = document.getElementById('backend-status-dot');
+    const txt = document.getElementById('backend-status-text');
+    try {
+      const stRes = await fetch(`${this.backendApiUrl}/api/status`, { signal: AbortSignal.timeout(2500) });
+      if (stRes.ok) {
+        const stData = await stRes.json();
+        if (stData.ok) {
+          this.isBackendConnected = true;
+          if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+          if (txt) txt.textContent = 'BACKEND: FASTAPI CONNECTED';
+
+          // Fetch real backend summary and cells
+          await this.loadBackendData();
+          return;
+        }
+      }
+    } catch (e) {
+      console.log('Backend API not responding, defaulting to real-time simulation:', e.message);
+    }
+    this.isBackendConnected = false;
+    if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+    if (txt) txt.textContent = 'BACKEND: SIMULATION MODE';
+  }
+
+  async loadBackendData() {
+    try {
+      const [sumRes, gridRes] = await Promise.all([
+        fetch(`${this.backendApiUrl}/api/summary`),
+        fetch(`${this.backendApiUrl}/api/grid`)
+      ]);
+      if (!sumRes.ok || !gridRes.ok) return;
+
+      const summary = await sumRes.json();
+      const gridDict = await gridRes.json();
+
+      // Convert FastAPI backend grid cells to display format
+      const backendCells = [];
+      const classMap = {
+        16: 'ROAD', 18: 'SIDEWALK', 13: 'PEDESTRIAN', 30: 'PEDESTRIAN',
+        8: 'VEHICLE', 10: 'VEHICLE', 11: 'VEHICLE', 18: 'VEHICLE', 20: 'VEHICLE',
+        9: 'CYCLIST', 14: 'CYCLIST', 15: 'CYCLIST', 31: 'CYCLIST', 32: 'CYCLIST',
+        17: 'TERRAIN', 19: 'TERRAIN', 50: 'BUILDING', 70: 'VEGETATION', 80: 'POLE'
+      };
+
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      setVal('stat-min-size', `${summary.min_cell_size.toFixed(2)} m`);
+      setVal('stat-max-size', `${summary.max_cell_size.toFixed(2)} m`);
+      setVal('stat-avg-size', `${summary.avg_cell_size.toFixed(2)} m`);
+      setVal('stat-num-cells', summary.total_cells.toLocaleString());
+      setVal('stat-occ-ratio', `${summary.avg_occupancy.toFixed(1)}%`);
+
+      const txt = document.getElementById('backend-status-text');
+      if (txt) txt.textContent = `BACKEND: FASTAPI (${summary.total_cells.toLocaleString()} CELLS)`;
+    } catch (err) {
+      console.error('Error parsing backend grid data:', err);
+    }
+  }
+
+  async runBackendPipeline() {
+    const txt = document.getElementById('backend-status-text');
+    if (txt) txt.textContent = 'BACKEND: RUNNING PIPELINE...';
+    try {
+      const res = await fetch(`${this.backendApiUrl}/api/run`, { method: 'POST' });
+      const data = await res.json();
+      if (data.ok) {
+        await this.loadBackendData();
+      }
+    } catch (e) {
+      alert('Backend pipeline execution failed: ' + e.message);
+      if (txt) txt.textContent = 'BACKEND: FASTAPI CONNECTED';
+    }
+  }
+
+  setupEvents() {
+    window.addEventListener('resize', () => this.resizeCanvas());
+    if (window.ResizeObserver) new ResizeObserver(() => this.resizeCanvas()).observe(this.container);
+
+    this.canvas.addEventListener('pointerdown', (e) => {
+      this.isDragging = true;
+      this.dragStartX = e.clientX - this.panX;
+      this.dragStartY = e.clientY - this.panY;
+      this.canvas.style.cursor = 'grabbing';
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (this.isDragging) {
+        this.panX = e.clientX - this.dragStartX;
+        this.panY = e.clientY - this.dragStartY;
+      }
+    });
+    window.addEventListener('pointerup', () => {
+      this.isDragging = false;
+      this.canvas.style.cursor = 'grab';
+    });
+
+    this.canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const rect = this.canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      const zf = e.deltaY < 0 ? 1.12 : 0.89;
+      const ns = Math.max(4, Math.min(35, this.scale * zf));
+      const wx = this.canvasToWorldX(mx), wz = this.canvasToWorldZ(my);
+      this.scale = ns;
+      this.panX = mx - this.container.clientWidth / 2 - wx * this.scale;
+      this.panY = my - this.container.clientHeight / 2 - wz * this.scale;
+    }, { passive: false });
+
+    // Hover detection
+    const tipEl = document.getElementById('grid-cell-tooltip');
+    this.canvas.addEventListener('pointermove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      this.mouseX = e.clientX - rect.left;
+      this.mouseY = e.clientY - rect.top;
+      const wx = this.canvasToWorldX(this.mouseX), wz = this.canvasToWorldZ(this.mouseY);
+      const r = Math.hypot(wx, wz);
+      let na = Math.atan2(wz, wx);
+      while (na < -Math.PI/2) na += Math.PI*2;
+      while (na >= 3*Math.PI/2) na -= Math.PI*2;
+
+      this.hoveredCell = null;
+      let hovObj = null;
+      if (this.trackedObjects) {
+        for (const ob of this.trackedObjects) {
+          if (Math.abs(wx - ob.currX) <= ob.w/2+0.3 && Math.abs(wz - ob.currZ) <= ob.l/2+0.3) { hovObj = ob; break; }
+        }
+      }
+      if (this.activeCells && r >= 0.45 && r <= 52) {
+        for (const c of this.activeCells) {
+          if (r >= c.rInner && r < c.rOuter && na >= c.thStart-1e-4 && na < c.thEnd+1e-4) {
+            this.hoveredCell = c;
+            if (!hovObj && c.trackedObject) hovObj = c.trackedObject;
+            break;
+          }
+        }
+      }
+
+      if ((this.hoveredCell || hovObj) && tipEl) {
+        tipEl.classList.remove('hidden');
+        const c = this.hoveredCell || {};
+        const ob = hovObj;
+        const ci = this.CLASSES[ob ? ob.type : (c.type||'UNKNOWN')] || this.CLASSES.UNKNOWN;
+        const dot = document.getElementById('cell-tip-dot');
+        if (dot) dot.style.backgroundColor = ci.hex;
+        const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        const setClass = (id, cls) => { const el = document.getElementById(id); if (el) el.className = cls; };
+
+        if (ob) {
+          setText('cell-tip-class', ob.id);
+          setText('cell-tip-conf', `${(ob.conf*100).toFixed(1)}% CONF`);
+          setText('cell-tip-id', `${ob.id} (${ci.name})`);
+          const kmh = (ob.speed*3.6).toFixed(1);
+          setText('cell-tip-vel', `${ob.speed.toFixed(1)} m/s (${kmh} km/h)`);
+          setText('cell-tip-heading', `${ob.heading.toFixed(1)}° (${ob.headingDir})`);
+          const accStr = ob.accel > 0 ? `+${ob.accel.toFixed(2)}` : ob.accel.toFixed(2);
+          const action = ob.accel < -0.1 ? 'Braking' : ob.accel > 0.1 ? 'Accelerating' : 'Cruising';
+          setText('cell-tip-accel', `${accStr} m/s² (${action})`);
+          setText('cell-tip-age', `${ob.age} frames`);
+          setText('cell-tip-horizon', ob.isDynamic ? '5.0s (5 Horizons)' : 'Static');
+          setText('cell-tip-ttc', ob.ttc < 99 ? `${ob.ttc.toFixed(1)}s / ${ob.cpa.toFixed(1)}m` : 'N/A');
+          const rl = ob.riskLevel || 'SAFE';
+          setText('cell-tip-risk', this.RISK_COLORS[rl].label);
+          setClass('cell-tip-risk', rl === 'COLLISION' ? 'text-red-400 font-bold' : rl === 'CONFLICT' ? 'text-orange-400 font-bold' : rl === 'ATTENTION' ? 'text-amber-400 font-bold' : 'text-emerald-400 font-bold');
+          setText('cell-tip-height', `+${ob.h.toFixed(2)} m`);
+          setText('cell-tip-hazard', `${(ob.hazard*100).toFixed(1)}%`);
+        } else {
+          setText('cell-tip-class', ci.name);
+          setText('cell-tip-conf', `${((c.currConfidence||0.99)*100).toFixed(1)}% CONF`);
+          setText('cell-tip-id', c.id || 'Cell');
+          setText('cell-tip-vel', '0 m/s (Static)');
+          setText('cell-tip-heading', 'N/A');
+          setText('cell-tip-accel', '0.00 m/s²');
+          setText('cell-tip-age', 'Continuous');
+          setText('cell-tip-horizon', 'Static');
+          setText('cell-tip-ttc', 'N/A');
+          setText('cell-tip-risk', 'N/A');
+          setText('cell-tip-height', `${(c.currHeight||0).toFixed(2)} m`);
+          setText('cell-tip-hazard', `${((c.currHazard||0)*100).toFixed(1)}%`);
+        }
+        const dv = ob ? Math.hypot(ob.currX, ob.currZ) : (c.r || r);
+        const csz = 0.20 + 0.03 * dv;
+        setText('cell-tip-dist', `${dv.toFixed(2)} m`);
+        setText('cell-tip-size', `${csz.toFixed(3)} m`);
+        setText('cell-tip-occ', `${((c.currOccupancy||0.02)*100).toFixed(1)}%`);
+
+        let tx = this.mouseX + 16, ty = this.mouseY - 20;
+        if (tx + 280 > this.container.clientWidth) tx = this.mouseX - 285;
+        if (ty + 240 > this.container.clientHeight) ty = this.container.clientHeight - 245;
+        if (ty < 10) ty = 10;
+        tipEl.style.left = `${tx}px`;
+        tipEl.style.top = `${ty}px`;
+      } else if (tipEl) {
+        tipEl.classList.add('hidden');
+      }
+    });
+
+    this.canvas.addEventListener('pointerleave', () => {
+      this.hoveredCell = null;
+      const tipEl = document.getElementById('grid-cell-tooltip');
+      if (tipEl) tipEl.classList.add('hidden');
+    });
+
+    // Buttons
+    const br = document.getElementById('btn-grid-reset');
+    if (br) br.addEventListener('click', () => { this.scale = 11.5; this.panX = 0; this.panY = 70; });
+    const bzi = document.getElementById('btn-grid-zoom-in');
+    if (bzi) bzi.addEventListener('click', () => { this.scale = Math.min(35, this.scale * 1.25); });
+    const bzo = document.getElementById('btn-grid-zoom-out');
+    if (bzo) bzo.addEventListener('click', () => { this.scale = Math.max(4, this.scale * 0.80); });
+
+    // Layer toggles
+    const mkToggle = (id, prop, onCls, offCls) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('click', () => {
+        this[prop] = !this[prop];
+        el.className = this[prop] ? onCls : offCls;
+      });
+    };
+    const off = 'px-2 py-0.5 rounded bg-[#1e293b] text-neutral-400 border border-neutral-700 transition-colors';
+    mkToggle('toggle-layer-pred', 'showPredictions', 'px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 transition-colors', off);
+    mkToggle('toggle-layer-risk', 'showRisk', 'px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/40 transition-colors', off);
+    mkToggle('toggle-layer-focc', 'showFutureOcc', 'px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/40 transition-colors', off);
+    mkToggle('toggle-layer-radar', 'showRadar', 'px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 transition-colors', off);
+
+    // Backend Sync Button Event
+    const btnSync = document.getElementById('btn-backend-sync');
+    if (btnSync) {
+      btnSync.addEventListener('click', () => {
+        if (this.isBackendConnected) {
+          this.runBackendPipeline();
+        } else {
+          this.checkAndFetchBackend();
+        }
+      });
+    }
+  }
+
+  resizeCanvas() {
+    if (!this.container || !this.canvas) return;
+    const w = this.container.clientWidth, h = this.container.clientHeight;
+    if (!w || !h) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.canvas.width = w * dpr;
+    this.canvas.height = h * dpr;
+    this.ctx.setTransform(1,0,0,1,0,0);
+    this.ctx.scale(dpr, dpr);
+  }
+
+  get originX() { return this.container.clientWidth / 2 + this.panX; }
+  get originY() { return this.container.clientHeight / 2 + this.panY; }
+  worldToCanvasX(wx) { return this.originX + wx * this.scale; }
+  worldToCanvasY(wz) { return this.originY + wz * this.scale; }
+  canvasToWorldX(cx) { return (cx - this.originX) / this.scale; }
+  canvasToWorldZ(cy) { return (cy - this.originY) / this.scale; }
+
+  setBackendData(d) { this.setGridData(d); }
+  setGridData(d) {
+    this.gridData = d;
+    if (d.stats) {
+      const s = d.stats;
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      set('stat-min-size', `${s.minCellSize.toFixed(2)} m`);
+      set('stat-max-size', `${s.maxCellSize.toFixed(2)} m`);
+      set('stat-avg-size', `${s.avgCellSize.toFixed(2)} m`);
+      set('stat-num-cells', s.numCells.toLocaleString());
+      set('stat-occ-ratio', `${s.occupancyRatio.toFixed(1)}%`);
+      set('stat-red-pct', `-${s.reductionPct.toFixed(1)}%`);
+    }
+  }
+
+  // ── TTC & CPA Calculation ──
+  computeTTC(egoTraj, ob) {
+    if (!ob.isDynamic || ob.speed < 0.05) return { ttc: 999, cpa: 999 };
+    const rad = ob.heading * Math.PI / 180;
+    const ux = Math.sin(rad), uz = -Math.cos(rad);
+    let minDist = 999, ttcVal = 999;
+    for (let t = 0.1; t <= 5.0; t += 0.1) {
+      const dist = ob.speed * t + 0.5 * ob.accel * t * t;
+      const px = ob.currX + ux * dist, pz = ob.currZ + uz * dist;
+      // Ego future position from planned trajectory (linear interpolation)
+      const eIdx = Math.min(egoTraj.length - 1, Math.floor(t / 5.0 * (egoTraj.length - 1)));
+      const eFrac = (t / 5.0 * (egoTraj.length - 1)) - eIdx;
+      const e0 = egoTraj[eIdx], e1 = egoTraj[Math.min(egoTraj.length-1, eIdx+1)];
+      const ex = e0.x + (e1.x - e0.x) * eFrac, ez = e0.z + (e1.z - e0.z) * eFrac;
+      const d = Math.hypot(px - ex, pz - ez);
+      if (d < minDist) { minDist = d; ttcVal = t; }
+    }
+    return { ttc: ttcVal, cpa: minDist };
+  }
+
+  riskLevel(ttc, cpa) {
+    if (cpa < 1.5 && ttc < 2.0) return 'COLLISION';
+    if (cpa < 3.0 && ttc < 3.0) return 'CONFLICT';
+    if (cpa < 5.0 && ttc < 4.0) return 'ATTENTION';
+    return 'SAFE';
+  }
+
+  riskColor(level) { return this.RISK_COLORS[level] || this.RISK_COLORS.SAFE; }
+
+  loadFrame(frameId, immediate = false) {
+    this.currentFrame = frameId;
+    const offset = frameId - 14289;
+    const data = this.generateGrid(offset);
+    this.setGridData(data);
+    this.trajectory = data.trajectory;
+    this.rings = data.rings;
+
+    // Compute TTC/CPA & Risk for each tracked object
+    data.trackedObjects.forEach(ob => {
+      const { ttc, cpa } = this.computeTTC(data.trajectory, ob);
+      ob.ttc = ttc;
+      ob.cpa = cpa;
+      ob.riskLevel = this.riskLevel(ttc, cpa);
+    });
+
+    // Risk interactions list
+    this.riskInteractions = data.trackedObjects
+      .filter(o => o.isDynamic && o.riskLevel !== 'SAFE')
+      .sort((a, b) => a.ttc - b.ttc);
+
+    if (immediate || !this.trackedObjects.length) {
+      this.trackedObjects = data.trackedObjects.map(o => ({ ...o, currX: o.x, currZ: o.z }));
+      this.activeCells = data.cells.map(c => ({
+        ...c, currHeight: c.height, currOccupancy: c.occupancy, currHazard: c.hazard,
+        currConfidence: c.confidence, currR: c.targetR, currG: c.targetG, currB: c.targetB, currAlpha: c.targetAlpha
+      }));
+    } else {
+      data.trackedObjects.forEach((t, i) => {
+        const e = this.trackedObjects[i];
+        if (e && e.id === t.id) {
+          Object.assign(e, { x: t.x, z: t.z, speed: t.speed, heading: t.heading, accel: t.accel, conf: t.conf,
+            age: t.age, hazard: t.hazard, predictedTrajectory: t.predictedTrajectory, ttc: t.ttc, cpa: t.cpa, riskLevel: t.riskLevel });
+        } else {
+          this.trackedObjects[i] = { ...t, currX: t.x, currZ: t.z };
+        }
+      });
+      const len = Math.min(this.activeCells.length, data.cells.length);
+      for (let i = 0; i < len; i++) {
+        const ac = this.activeCells[i], tc = data.cells[i];
+        ac.targetHeight = tc.height; ac.targetOccupancy = tc.occupancy; ac.targetHazard = tc.hazard;
+        ac.targetConfidence = tc.confidence; ac.targetR = tc.targetR; ac.targetG = tc.targetG;
+        ac.targetB = tc.targetB; ac.targetAlpha = tc.targetAlpha;
+        ac.type = tc.type; ac.instanceId = tc.instanceId; ac.trackedObject = tc.trackedObject;
+        ac.traversability = tc.traversability; ac.isOccupied = tc.isOccupied;
+      }
+    }
+
+    this.updatePanels(data.trackedObjects);
+  }
+
+  updatePanels(objects) {
+    const dynObjs = objects.filter(o => o.isDynamic);
+    const staticObjs = objects.filter(o => !o.isDynamic);
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    const setClass = (id, cls) => { const el = document.getElementById(id); if (el) el.className = cls; };
+
+    // MOT counters
+    set('mot-total', objects.length);
+    set('mot-dynamic', dynObjs.length < 10 ? `0${dynObjs.length}` : dynObjs.length);
+    set('mot-static', staticObjs.length < 10 ? `0${staticObjs.length}` : staticObjs.length);
+    let best = objects[0]; let confSum = 0;
+    objects.forEach(o => { confSum += o.conf; if (o.conf > best.conf) best = o; });
+    set('mot-highest-conf', `${best.id} (${(best.conf*100).toFixed(1)}%)`);
+    set('mot-avg-conf', `${((confSum/objects.length)*100).toFixed(1)}%`);
+
+    // MOT instances list
+    const elList = document.getElementById('mot-instances-list');
+    if (elList) {
+      elList.innerHTML = dynObjs.map(o => {
+        const ci = this.CLASSES[o.type] || this.CLASSES.UNKNOWN;
+        const rc = this.riskColor(o.riskLevel);
+        return `<div class="p-1.5 rounded-lg bg-[#121927] border border-[#1e293b] flex items-center justify-between text-[9.5px]">
+          <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background:${ci.hex}"></span><span class="font-bold text-white">${o.id}</span></div>
+          <div class="flex items-center gap-2"><span class="text-neutral-400">${o.speed.toFixed(1)}m/s</span><span style="color:${rc.hex}" class="font-bold">${rc.label}</span></div>
+        </div>`;
+      }).join('');
+    }
+
+    // Prediction Panel
+    const risks = objects.filter(o => o.isDynamic && o.riskLevel !== 'SAFE');
+    const highestRisk = risks.length ? risks.sort((a,b) => a.ttc - b.ttc)[0] : null;
+    const minTTC = highestRisk ? highestRisk.ttc : 99;
+    const minCPA = highestRisk ? highestRisk.cpa : 99;
+    const overallRisk = minTTC < 2 ? 'HIGH' : minTTC < 3.5 ? 'MEDIUM' : 'LOW';
+
+    set('pred-collision-risk', overallRisk);
+    const riskEl = document.getElementById('pred-collision-risk');
+    if (riskEl) riskEl.className = overallRisk === 'HIGH' ? 'text-red-400 font-bold text-sm' : overallRisk === 'MEDIUM' ? 'text-amber-400 font-bold text-sm' : 'text-emerald-400 font-bold text-sm';
+    set('pred-min-ttc', minTTC < 99 ? `${minTTC.toFixed(1)}s` : 'N/A');
+    set('pred-min-cpa', minCPA < 99 ? `${minCPA.toFixed(1)}m` : 'N/A');
+    set('pred-highest-risk', highestRisk ? highestRisk.id : 'None');
+    const activeTrajs = dynObjs.filter(o => o.speed > 0.1).length;
+    set('pred-active-traj', activeTrajs);
+    set('pred-time-horizon', '5.0 s');
+
+    let predConfSum = 0; let predCount = 0;
+    dynObjs.forEach(o => { if (o.predictedTrajectory) { predConfSum += o.conf; predCount++; } });
+    set('pred-avg-conf', predCount > 0 ? `${((predConfSum/predCount)*100).toFixed(1)}%` : 'N/A');
+
+    // Risk list
+    const rList = document.getElementById('pred-risk-list');
+    if (rList) {
+      rList.innerHTML = risks.map(o => {
+        const rc = this.riskColor(o.riskLevel);
+        return `<div class="p-1 rounded bg-[#121927] border border-[#1e293b] flex items-center justify-between text-[9px]">
+          <span class="font-bold text-white">${o.id}</span>
+          <span class="flex items-center gap-2">
+            <span class="text-neutral-400">TTC:${o.ttc.toFixed(1)}s CPA:${o.cpa.toFixed(1)}m</span>
+            <span style="color:${rc.hex}" class="font-bold">${rc.label.toUpperCase()}</span>
+          </span>
+        </div>`;
+      }).join('');
+    }
+
+    // Header badges
+    set('hdr-tracked-count', objects.length);
+    const hdrBadge = document.getElementById('hdr-risk-badge');
+    if (hdrBadge) {
+      const colors = overallRisk === 'HIGH' ? ['red', '#EF4444'] : overallRisk === 'MEDIUM' ? ['amber', '#F59E0B'] : ['emerald', '#22C55E'];
+      hdrBadge.className = `text-${colors[0]}-400 bg-${colors[0]}-500/10 border border-${colors[0]}-500/20 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1`;
+      hdrBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-${colors[0]}-400 animate-pulse"></span>RISK: ${overallRisk}`;
+    }
+    set('bl-ttc', minTTC < 99 ? `${minTTC.toFixed(1)}s` : 'N/A');
+    set('bl-cpa', minCPA < 99 ? `${minCPA.toFixed(1)}m` : 'N/A');
+  }
+
+  generateGrid(frameOffset = 0) {
+    let r = 0.45;
+    const R_MAX = 52.0;
+    const cells = [], rings = [];
+    let ringIndex = 0, totalCellSizeSum = 0, occupiedCount = 0;
+    const dt = frameOffset * 0.08;
+
+    const trackedObjects = [
+      { id:'Vehicle #021', type:'VEHICLE', x:1.8, z:-13.5-dt*6.5, w:1.9, l:4.6, h:1.55, speed:11.8, heading:0, headingDir:'Forward', accel:-0.35, conf:0.995, age:142+frameOffset, isDynamic:true, hazard:0.94, trajColor:'#F97316' },
+      { id:'Pedestrian #104', type:'PEDESTRIAN', x:2.6-dt*0.6, z:-18.5, w:0.8, l:0.8, h:1.80, speed:1.4, heading:270, headingDir:'Left Crossing', accel:0.05, conf:0.998, age:68+frameOffset, isDynamic:true, hazard:0.99, trajColor:'#EF4444' },
+      { id:'Cyclist #008', type:'CYCLIST', x:4.2, z:-16-dt*4.2, w:0.8, l:1.9, h:1.70, speed:5.4, heading:0, headingDir:'Forward', accel:0.12, conf:0.991, age:95+frameOffset, isDynamic:true, hazard:0.88, trajColor:'#A855F7' },
+      { id:'Vehicle #042', type:'VEHICLE', x:-2.0, z:-25-dt*5.8, w:2.0, l:4.8, h:1.72, speed:12.2, heading:0, headingDir:'Forward', accel:0.0, conf:0.992, age:210+frameOffset, isDynamic:true, hazard:0.96, trajColor:'#F97316' },
+      { id:'Vehicle #019', type:'VEHICLE', x:-2.2, z:-42+dt*7.2, w:1.9, l:4.5, h:1.48, speed:13.3, heading:180, headingDir:'Oncoming', accel:0.15, conf:0.989, age:84+frameOffset, isDynamic:true, hazard:0.98, trajColor:'#F97316' },
+      { id:'Pedestrian #105', type:'PEDESTRIAN', x:8.6, z:-6.5-dt*1.2, w:0.8, l:0.8, h:1.75, speed:1.2, heading:0, headingDir:'Forward', accel:0.0, conf:0.991, age:112+frameOffset, isDynamic:true, hazard:0.30, trajColor:'#EF4444' },
+      { id:'Pole #317', type:'POLE', x:7.1, z:-24, w:0.4, l:0.4, h:6.0, speed:0, heading:0, headingDir:'Static', accel:0, conf:0.990, age:1200+frameOffset, isDynamic:false, hazard:0.85 },
+      { id:'Pole #318', type:'POLE', x:-7.1, z:-16, w:0.4, l:0.4, h:6.0, speed:0, heading:0, headingDir:'Static', accel:0, conf:0.988, age:1200+frameOffset, isDynamic:false, hazard:0.85 },
+      { id:'TrafficSign #201', type:'TRAFFIC_SIGN', x:7.1, z:-24, w:0.7, l:0.2, h:3.2, speed:0, heading:0, headingDir:'Static', accel:0, conf:0.985, age:1200+frameOffset, isDynamic:false, hazard:0.20 },
+      { id:'Vehicle #065', type:'VEHICLE', x:5.2, z:-4.5, w:1.8, l:4.4, h:1.42, speed:0, heading:0, headingDir:'Parked', accel:0, conf:0.984, age:450+frameOffset, isDynamic:false, hazard:0.45 },
+      { id:'Vehicle #088', type:'VEHICLE', x:5.2, z:15, w:1.9, l:4.7, h:1.68, speed:0, heading:0, headingDir:'Parked', accel:0, conf:0.981, age:520+frameOffset, isDynamic:false, hazard:0.40 },
+      { id:'Vehicle #033', type:'VEHICLE', x:-5.2, z:11.5, w:2.2, l:6.2, h:2.65, speed:0, heading:0, headingDir:'Parked', accel:0, conf:0.986, age:380+frameOffset, isDynamic:false, hazard:0.50 },
+      { id:'Pedestrian #106', type:'PEDESTRIAN', x:-8.5, z:7.5, w:0.8, l:0.8, h:1.75, speed:0, heading:90, headingDir:'Loitering', accel:0, conf:0.978, age:165+frameOffset, isDynamic:false, hazard:0.30 }
+    ];
+
+    // Trajectory prediction for 5.0s horizon with 5 key horizons
+    trackedObjects.forEach(ob => {
+      if (ob.isDynamic && ob.speed > 0.05) {
+        const rad = ob.heading * Math.PI / 180;
+        const ux = Math.sin(rad), uz = -Math.cos(rad);
+        ob.predictedTrajectory = this.HORIZONS.map(t => {
+          const d = ob.speed * t + 0.5 * ob.accel * t * t;
+          const px = ob.x + ux * d, pz = ob.z + uz * d;
+          const sL = (0.30 + 0.12 * ob.speed) * t;
+          const sLat = 0.25 * Math.pow(t, 0.75);
+          const predConf = Math.max(0.5, ob.conf - 0.02 * t * t);
+          return { t, x: px, z: pz, sigmaLong: sL, sigmaLat: sLat, headingRad: Math.atan2(uz, ux), conf: predConf };
+        });
+      } else {
+        ob.predictedTrajectory = null;
+      }
+    });
+
+    // Build polar grid cells
+    while (r < R_MAX) {
+      const cellSize = 0.20 + 0.03 * r;
+      const rOuter = r + cellSize;
+      const rMid = (r + rOuter) / 2;
+      rings.push({ index: ringIndex, rInner: r, rOuter, cellSize });
+      const circ = 2 * Math.PI * rMid;
+      const nSec = Math.max(12, Math.round(circ / cellSize));
+      const dTh = 2 * Math.PI / nSec;
+
+      for (let s = 0; s < nSec; s++) {
+        const thS = s * dTh - Math.PI/2, thE = (s+1) * dTh - Math.PI/2, thM = (thS+thE)/2;
+        const cx = rMid * Math.cos(thM), cz = rMid * Math.sin(thM);
+        if (Math.abs(cx) > 16.5 || cz < -50 || cz > 22) continue;
+        totalCellSizeSum += cellSize;
+
+        let type='ROAD', height=0.02, occ=0.02, conf=0.994, trav=1, hazard=0.01, isOcc=false, hitOb=null;
+        for (const ob of trackedObjects) {
+          if (Math.abs(cx-ob.x) <= ob.w/2+cellSize*0.45 && Math.abs(cz-ob.z) <= ob.l/2+cellSize*0.45) { hitOb = ob; break; }
+        }
+
+        if (hitOb) { type=hitOb.type; height=hitOb.h; occ=0.98; conf=hitOb.conf; trav=0; hazard=hitOb.hazard; isOcc=true; }
+        else if (Math.abs(cx) > 10.5) {
+          if (Math.abs(cz) < 42 && Math.abs(cx) < 14.5) { type='BUILDING'; height=14.5; occ=0.96; conf=0.985; trav=0; hazard=0.75; isOcc=true; }
+          else { type='TERRAIN'; height=0.45; occ=0.40; conf=0.965; trav=0.15; hazard=0.35; isOcc=true; }
+        } else if (Math.abs(cx) >= 7 && Math.abs(cx) <= 10.5) {
+          if ((Math.abs(cz+36)<2||Math.abs(cz+14)<2||Math.abs(cz-16)<2||Math.abs(cz-34)<2)&&Math.abs(cx)>8) { type='VEGETATION'; height=5.2; occ=0.92; conf=0.978; trav=0; hazard=0.80; isOcc=true; }
+          else { type='SIDEWALK'; height=0.18; occ=0.25; conf=0.985; trav=0.10; hazard=0.20; isOcc=true; }
+        }
+        if (isOcc) occupiedCount++;
+
+        const bc = this.CLASSES[type] || this.CLASSES.UNKNOWN;
+        const normH = Math.min(1, Math.max(0, (height+0.1)/4.5));
+        const bf = 0.45 + 0.85 * Math.pow(normH, 0.65);
+        let tR = Math.min(255, Math.round(bc.rgb[0]*bf)), tG = Math.min(255, Math.round(bc.rgb[1]*bf)), tB = Math.min(255, Math.round(bc.rgb[2]*bf));
+        let cf = 1;
+        if (cz <= 0) { cf = Math.abs(cx) <= 7.5 ? 1 : Math.max(0.35, 1-(Math.abs(cx)-7.5)/7); }
+        else { cf = Math.max(0.18, 0.4-cz/28); }
+        let tA = isOcc ? Math.min(0.88, (0.35+0.55*occ)*cf) : 0.12*cf;
+
+        cells.push({ id:`R${ringIndex}-S${s}`, ring:ringIndex, sector:s, rInner:r, rOuter, thStart:thS, thEnd:thE, cx, cz, r:rMid, cellSize, type, instanceId:hitOb?hitOb.id:null, trackedObject:hitOb, height, occupancy:occ, confidence:conf, traversability:trav, hazard, isOccupied:isOcc, corridorFactor:cf, targetR:tR, targetG:tG, targetB:tB, targetAlpha:tA });
+      }
+      r = rOuter;
+      ringIndex++;
+    }
+
+    // Neighbor color smoothing
+    const cMap = new Map();
+    cells.forEach(c => cMap.set(`${c.ring}-${c.sector}`, c));
+    cells.forEach(c => {
+      const ns = [`${c.ring-1}-${c.sector}`,`${c.ring+1}-${c.sector}`,`${c.ring}-${c.sector-1}`,`${c.ring}-${c.sector+1}`].map(k => cMap.get(k)).filter(Boolean);
+      if (ns.length) {
+        let ar=0,ag=0,ab=0; ns.forEach(n => { ar+=n.targetR; ag+=n.targetG; ab+=n.targetB; });
+        ar/=ns.length; ag/=ns.length; ab/=ns.length;
+        c.targetR = Math.round(c.targetR*0.75+ar*0.25);
+        c.targetG = Math.round(c.targetG*0.75+ag*0.25);
+        c.targetB = Math.round(c.targetB*0.75+ab*0.25);
+      }
+    });
+
+    const numCells = cells.length;
+    const avgCS = totalCellSizeSum / Math.max(1, numCells);
+    const minCS = rings[0] ? rings[0].cellSize : 0.20;
+    const maxCS = rings.length ? rings[rings.length-1].cellSize : 1.76;
+    const occR = occupiedCount / Math.max(1, numCells) * 100;
+    const fge = Math.round(Math.PI * R_MAX * R_MAX / 0.04);
+    const redPct = (fge - numCells) / fge * 100;
+    const traj = [{x:0,z:-1.5},{x:0.1,z:-5},{x:0.3,z:-10},{x:0.7,z:-16},{x:1.2,z:-22},{x:1.8,z:-28},{x:2.1,z:-35},{x:1.9,z:-42},{x:1.5,z:-48}];
+
+    return { cells, rings, trackedObjects, trajectory: traj, stats: { minCellSize:minCS, maxCellSize:maxCS, avgCellSize:avgCS, numCells, occupancyRatio:occR, reductionPct:redPct } };
+  }
+
+  startRenderLoop() {
+    const render = () => {
+      this.animTime += 0.016;
+      const ls = 0.16;
+      if (this.activeCells.length) {
+        for (const c of this.activeCells) {
+          if (c.targetHeight !== undefined) {
+            c.currHeight += (c.targetHeight-c.currHeight)*ls; c.currOccupancy += (c.targetOccupancy-c.currOccupancy)*ls;
+            c.currHazard += (c.targetHazard-c.currHazard)*ls; c.currConfidence += (c.targetConfidence-c.currConfidence)*ls;
+            c.currR += (c.targetR-c.currR)*ls; c.currG += (c.targetG-c.currG)*ls; c.currB += (c.targetB-c.currB)*ls; c.currAlpha += (c.targetAlpha-c.currAlpha)*ls;
+          }
+        }
+      }
+      if (this.trackedObjects.length) {
+        for (const ob of this.trackedObjects) { ob.currX += (ob.x-ob.currX)*ls; ob.currZ += (ob.z-ob.currZ)*ls; }
+      }
+      this.draw();
+      requestAnimationFrame(render);
+    };
+    requestAnimationFrame(render);
+  }
+
+  draw() {
+    const ctx = this.ctx, w = this.container.clientWidth, h = this.container.clientHeight;
+    if (!w || !h) return;
+    ctx.fillStyle = '#05070B';
+    ctx.fillRect(0, 0, w, h);
+    const ex = this.worldToCanvasX(0), ey = this.worldToCanvasY(0);
+
+    // Grid
+    ctx.save(); ctx.lineWidth = 0.5; ctx.strokeStyle = 'rgba(255,255,255,0.035)';
+    for (let x=-30;x<=30;x+=10) { const cx=this.worldToCanvasX(x); ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,h); ctx.stroke(); }
+    for (let z=-60;z<=30;z+=10) { const cy=this.worldToCanvasY(z); ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(w,cy); ctx.stroke(); }
+    ctx.restore();
+
+    // Radar rings
+    if (this.showRadar) {
+      ctx.save();
+      [5,10,20,30,40,50].forEach(d => {
+        const rP = d*this.scale;
+        ctx.strokeStyle = d%20===0 ? 'rgba(56,189,248,0.22)' : 'rgba(14,165,233,0.14)';
+        ctx.lineWidth = d%20===0 ? 1 : 0.6;
+        ctx.beginPath(); ctx.arc(ex,ey,rP,0,Math.PI*2); ctx.stroke();
+        ctx.font = '7.5px "JetBrains Mono",monospace'; ctx.fillStyle = 'rgba(56,189,248,0.65)';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(`${d}M`, ex, ey-rP-2);
+      });
+      ctx.setLineDash([3,5]); ctx.strokeStyle = 'rgba(56,189,248,0.08)'; ctx.lineWidth = 0.5;
+      [-60,-45,-30,-15,0,15,30,45,60].forEach(deg => {
+        const rad = (deg-90)*Math.PI/180, mr = 52*this.scale;
+        ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(ex+mr*Math.cos(rad), ey+mr*Math.sin(rad)); ctx.stroke();
+      });
+      ctx.setLineDash([]); ctx.restore();
+    }
+
+    // Future occupancy heatmap
+    if (this.showFutureOcc && this.trackedObjects) {
+      ctx.save();
+      this.trackedObjects.forEach(ob => {
+        if (!ob.isDynamic || !ob.predictedTrajectory) return;
+        ob.predictedTrajectory.forEach(wp => {
+          const px = this.worldToCanvasX(wp.x), py = this.worldToCanvasY(wp.z);
+          const futR = Math.max(ob.w, ob.l) * this.scale * (0.8 + wp.t * 0.4);
+          const alpha = Math.max(0.02, 0.12 - wp.t * 0.018);
+          const rc = this.riskColor(ob.riskLevel);
+          const grad = ctx.createRadialGradient(px,py,0,px,py,futR);
+          grad.addColorStop(0, `rgba(${rc.rgb[0]},${rc.rgb[1]},${rc.rgb[2]},${alpha})`);
+          grad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath(); ctx.arc(px,py,futR,0,Math.PI*2); ctx.fill();
+        });
+      });
+      ctx.restore();
+    }
+
+    // Drivable corridor
+    ctx.save();
+    const lx = this.worldToCanvasX(-7.5), rx = this.worldToCanvasX(7.5), ty = this.worldToCanvasY(-50), by = this.worldToCanvasY(18);
+    const grad = ctx.createLinearGradient(0,ty,0,by);
+    grad.addColorStop(0,'rgba(16,185,129,0.06)'); grad.addColorStop(0.4,'rgba(6,182,212,0.05)'); grad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = grad; ctx.fillRect(lx,ty,rx-lx,by-ty);
+    ctx.strokeStyle = 'rgba(16,185,129,0.35)'; ctx.lineWidth = 1; ctx.setLineDash([8,6]);
+    ctx.beginPath(); ctx.moveTo(lx,ty); ctx.lineTo(lx,by); ctx.moveTo(rx,ty); ctx.lineTo(rx,by); ctx.stroke();
+    ctx.restore();
+
+    // Adaptive cells
+    if (this.activeCells.length) {
+      ctx.save();
+      for (const c of this.activeCells) {
+        const rIn = c.rInner*this.scale, rOut = c.rOuter*this.scale;
+        const r = Math.round(c.currR), g = Math.round(c.currG), b = Math.round(c.currB);
+        const a = Math.max(0.04, Math.min(0.92, c.currAlpha));
+        ctx.beginPath(); ctx.arc(ex,ey,rIn,c.thStart,c.thEnd,false); ctx.arc(ex,ey,rOut,c.thEnd,c.thStart,true); ctx.closePath();
+        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
+        if (c.isOccupied && c.currOccupancy > 0.5) { ctx.shadowColor = `rgba(${r},${g},${b},0.35)`; ctx.shadowBlur = 4; } else { ctx.shadowBlur = 0; }
+        ctx.fill(); ctx.shadowBlur = 0;
+        ctx.lineWidth = 0.35;
+        ctx.strokeStyle = c.isOccupied ? `rgba(${r},${g},${b},0.22)` : 'rgba(255,255,255,0.025)';
+        ctx.stroke();
+      }
+      // Instance ID labels
+      if (this.trackedObjects) {
+        for (const ob of this.trackedObjects) {
+          const cx = this.worldToCanvasX(ob.currX), cy = this.worldToCanvasY(ob.currZ);
+          ctx.font = 'bold 7px "JetBrains Mono",sans-serif';
+          const tw = ctx.measureText(ob.id).width, pw = tw+8, ph = 11;
+          const ci = this.CLASSES[ob.type] || this.CLASSES.UNKNOWN;
+          ctx.fillStyle = 'rgba(10,15,24,0.88)'; ctx.strokeStyle = ci.hex; ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(cx-pw/2,cy-ph/2,pw,ph,3); else ctx.rect(cx-pw/2,cy-ph/2,pw,ph);
+          ctx.fill(); ctx.stroke();
+          ctx.fillStyle = '#FFF'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(ob.id, cx, cy);
+        }
+      }
+      ctx.restore();
+    }
+
+    // Predicted trajectories with fading markers and ellipses
+    if (this.showPredictions && this.trackedObjects) {
+      ctx.save();
+      for (const ob of this.trackedObjects) {
+        if (!ob.isDynamic || !ob.predictedTrajectory) continue;
+        const wps = ob.predictedTrajectory;
+        const ci = this.CLASSES[ob.type] || this.CLASSES.UNKNOWN;
+        const tc = ob.trajColor || ci.hex;
+        const sx = this.worldToCanvasX(ob.currX), sy = this.worldToCanvasY(ob.currZ);
+
+        // Spline
+        ctx.strokeStyle = tc; ctx.lineWidth = 2; ctx.shadowColor = tc; ctx.shadowBlur = 7;
+        ctx.setLineDash([5,3]); ctx.lineDashOffset = -this.animTime*14; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(sx, sy);
+        for (let i = 0; i < wps.length-1; i++) {
+          const c1 = this.worldToCanvasX(wps[i].x), c1y = this.worldToCanvasY(wps[i].z);
+          const c2 = this.worldToCanvasX(wps[i+1].x), c2y = this.worldToCanvasY(wps[i+1].z);
+          ctx.quadraticCurveTo(c1, c1y, (c1+c2)/2, (c1y+c2y)/2);
+        }
+        const last = wps[wps.length-1];
+        ctx.lineTo(this.worldToCanvasX(last.x), this.worldToCanvasY(last.z));
+        ctx.stroke(); ctx.setLineDash([]); ctx.shadowBlur = 0;
+
+        // Fading markers and uncertainty ellipses at each horizon
+        wps.forEach(wp => {
+          const px = this.worldToCanvasX(wp.x), py = this.worldToCanvasY(wp.z);
+          const fadeAlpha = Math.max(0.15, 1.0 - wp.t * 0.16);
+
+          // Confidence ellipse
+          if (this.showRisk) {
+            const rxP = wp.sigmaLong * this.scale, ryP = wp.sigmaLat * this.scale;
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(px, py, Math.max(2,rxP), Math.max(1.5,ryP), wp.headingRad, 0, Math.PI*2);
+            ctx.fillStyle = `${tc}${Math.round(fadeAlpha*25).toString(16).padStart(2,'0')}`;
+            ctx.fill();
+            ctx.strokeStyle = `${tc}${Math.round(fadeAlpha*100).toString(16).padStart(2,'0')}`;
+            ctx.lineWidth = 0.8; ctx.setLineDash([2,3]); ctx.stroke(); ctx.setLineDash([]);
+            ctx.restore();
+          }
+
+          // Progressively fading marker
+          ctx.fillStyle = `rgba(255,255,255,${fadeAlpha})`;
+          ctx.beginPath(); ctx.arc(px, py, Math.max(1.5, 3 - wp.t*0.35), 0, Math.PI*2); ctx.fill();
+          // Time annotation
+          ctx.font = '7px "JetBrains Mono",monospace';
+          ctx.fillStyle = `${tc}${Math.round(fadeAlpha*180).toString(16).padStart(2,'0')}`;
+          ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+          ctx.fillText(`+${wp.t.toFixed(1)}s`, px, py - (wp.sigmaLat*this.scale||5) - 2);
+        });
+      }
+      ctx.restore();
+    }
+
+    // Risk interaction zones
+    if (this.showRisk && this.riskInteractions) {
+      ctx.save();
+      this.riskInteractions.forEach(ob => {
+        if (!ob.predictedTrajectory) return;
+        const rc = this.riskColor(ob.riskLevel);
+        // Connect ego traj to nearest approach
+        const ttcWp = ob.predictedTrajectory.find(wp => Math.abs(wp.t - ob.ttc) < 0.6);
+        if (ttcWp) {
+          const px = this.worldToCanvasX(ttcWp.x), py = this.worldToCanvasY(ttcWp.z);
+          // TTC warning ring
+          ctx.strokeStyle = rc.hex; ctx.lineWidth = 1.5;
+          ctx.shadowColor = rc.hex; ctx.shadowBlur = 8;
+          const pulseR = 8 + 6 * Math.sin(this.animTime * 5);
+          ctx.setLineDash([3,3]); ctx.beginPath(); ctx.arc(px,py,pulseR,0,Math.PI*2); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.shadowBlur = 0;
+          ctx.font = 'bold 8px "JetBrains Mono",sans-serif';
+          ctx.fillStyle = rc.hex; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+          ctx.fillText(`TTC:${ob.ttc.toFixed(1)}s`, px, py - pulseR - 3);
+        }
+      });
+      ctx.restore();
+    }
+
+    // Tracked objects bounding boxes
+    if (this.trackedObjects.length) {
+      ctx.save();
+      for (const ob of this.trackedObjects) {
+        const cx = this.worldToCanvasX(ob.currX), cy = this.worldToCanvasY(ob.currZ);
+        const wP = ob.w*this.scale, lP = ob.l*this.scale;
+        const ci = this.CLASSES[ob.type] || this.CLASSES.UNKNOWN;
+        const x0 = cx-wP/2, y0 = cy-lP/2, x1 = cx+wP/2, y1 = cy+lP/2;
+        const bl = Math.min(wP,lP)*0.35;
+
+        if (ob.isDynamic && ob.speed > 0.1) {
+          ctx.strokeStyle = ci.hex; ctx.lineWidth = 1.8;
+          ctx.shadowColor = ci.hex; ctx.shadowBlur = 6+3*Math.sin(this.animTime*6);
+          ctx.setLineDash([5,4]); ctx.lineDashOffset = -this.animTime*20;
+          ctx.strokeRect(x0,y0,wP,lP);
+          ctx.setLineDash([]); ctx.shadowBlur = 0;
+
+          ctx.strokeStyle = '#FFF'; ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(x0,y0+bl); ctx.lineTo(x0,y0); ctx.lineTo(x0+bl,y0);
+          ctx.moveTo(x1-bl,y0); ctx.lineTo(x1,y0); ctx.lineTo(x1,y0+bl);
+          ctx.moveTo(x0,y1-bl); ctx.lineTo(x0,y1); ctx.lineTo(x0+bl,y1);
+          ctx.moveTo(x1-bl,y1); ctx.lineTo(x1,y1); ctx.lineTo(x1,y1-bl);
+          ctx.stroke();
+
+          // Velocity arrow
+          const aLen = 12+ob.speed*3;
+          const rad = ob.heading*Math.PI/180;
+          const ux = Math.sin(rad), uz = -Math.cos(rad);
+          const tipX = cx+ux*(lP/2+aLen), tipY = cy+uz*(lP/2+aLen);
+          const stX = cx+ux*lP/2, stY = cy+uz*lP/2;
+          ctx.strokeStyle = '#22C55E'; ctx.fillStyle = '#22C55E'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(stX,stY); ctx.lineTo(tipX,tipY); ctx.stroke();
+          const aa = Math.atan2(tipY-stY, tipX-stX);
+          ctx.beginPath(); ctx.moveTo(tipX,tipY);
+          ctx.lineTo(tipX-6*Math.cos(aa-Math.PI/6), tipY-6*Math.sin(aa-Math.PI/6));
+          ctx.lineTo(tipX-6*Math.cos(aa+Math.PI/6), tipY-6*Math.sin(aa+Math.PI/6));
+          ctx.closePath(); ctx.fill();
+          ctx.font = 'bold 7.5px "JetBrains Mono",sans-serif';
+          ctx.fillStyle = '#FFF'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+          ctx.fillText(`${ob.speed.toFixed(1)}m/s`, tipX, tipY-2);
+        } else {
+          ctx.strokeStyle = ci.hex; ctx.lineWidth = 1.2; ctx.setLineDash([]); ctx.strokeRect(x0,y0,wP,lP);
+          ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(x0,y0+bl); ctx.lineTo(x0,y0); ctx.lineTo(x0+bl,y0);
+          ctx.moveTo(x1-bl,y0); ctx.lineTo(x1,y0); ctx.lineTo(x1,y0+bl);
+          ctx.moveTo(x0,y1-bl); ctx.lineTo(x0,y1); ctx.lineTo(x0+bl,y1);
+          ctx.moveTo(x1-bl,y1); ctx.lineTo(x1,y1); ctx.lineTo(x1,y1-bl);
+          ctx.stroke();
+        }
+
+        // Metadata tag
+        ctx.font = 'bold 7.5px "JetBrains Mono",sans-serif'; ctx.fillStyle = '#FFF';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+        ctx.fillText(`${ob.id} [${(ob.conf*100).toFixed(0)}%]`, cx, y0-3);
+      }
+      ctx.restore();
+    }
+
+    // Ego planned trajectory
+    if (this.trajectory && this.trajectory.length > 1) {
+      ctx.save();
+      ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 2.5;
+      ctx.shadowColor = 'rgba(0,229,255,0.6)'; ctx.shadowBlur = 6; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(this.worldToCanvasX(this.trajectory[0].x), this.worldToCanvasY(this.trajectory[0].z));
+      for (let i=1;i<this.trajectory.length-1;i++) {
+        const c=this.trajectory[i],n=this.trajectory[i+1];
+        ctx.quadraticCurveTo(this.worldToCanvasX(c.x),this.worldToCanvasY(c.z),this.worldToCanvasX((c.x+n.x)/2),this.worldToCanvasY((c.z+n.z)/2));
+      }
+      const l = this.trajectory[this.trajectory.length-1];
+      ctx.lineTo(this.worldToCanvasX(l.x),this.worldToCanvasY(l.z)); ctx.stroke();
+      ctx.shadowBlur = 0;
+      this.trajectory.forEach((p,i) => { ctx.fillStyle = i===0?'#22C55E':'#38BDF8'; ctx.beginPath(); ctx.arc(this.worldToCanvasX(p.x),this.worldToCanvasY(p.z),2,0,Math.PI*2); ctx.fill(); });
+      ctx.restore();
+    }
+
+    // Ego vehicle
+    ctx.save();
+    const wP = 1.9*this.scale, lP = 4.5*this.scale;
+    const fovR = 26*this.scale;
+    const fg = ctx.createRadialGradient(ex,ey,0,ex,ey,fovR);
+    fg.addColorStop(0,'rgba(6,182,212,0.12)'); fg.addColorStop(0.7,'rgba(6,182,212,0.03)'); fg.addColorStop(1,'rgba(6,182,212,0)');
+    ctx.fillStyle = fg; ctx.beginPath(); ctx.moveTo(ex,ey); ctx.arc(ex,ey,fovR,-Math.PI/2-Math.PI/3,-Math.PI/2+Math.PI/3,false); ctx.closePath(); ctx.fill();
+    ctx.shadowColor='rgba(0,0,0,0.7)'; ctx.shadowBlur=10; ctx.fillStyle='#0F172A'; ctx.fillRect(ex-wP/2,ey-lP/2,wP,lP); ctx.shadowBlur=0;
+    ctx.strokeStyle='#38BDF8'; ctx.lineWidth=1.5; ctx.strokeRect(ex-wP/2,ey-lP/2,wP,lP);
+    ctx.fillStyle='#1E293B'; ctx.fillRect(ex-wP/2+2,ey-lP/2+6,wP-4,7);
+    ctx.fillStyle='#00E5FF'; ctx.shadowColor='#00E5FF'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.arc(ex,ey,3.5,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+    ctx.strokeStyle='#22C55E'; ctx.fillStyle='#22C55E'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(ex,ey-lP/2); ctx.lineTo(ex,ey-lP/2-28); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ex,ey-lP/2-33); ctx.lineTo(ex-4,ey-lP/2-26); ctx.lineTo(ex+4,ey-lP/2-26); ctx.closePath(); ctx.fill();
+    ctx.restore();
+
+    // Hovered cell highlight
+    if (this.hoveredCell) {
+      ctx.save();
+      const c = this.hoveredCell;
+      ctx.beginPath(); ctx.arc(ex,ey,c.rInner*this.scale,c.thStart,c.thEnd,false);
+      ctx.arc(ex,ey,c.rOuter*this.scale,c.thEnd,c.thStart,true); ctx.closePath();
+      ctx.strokeStyle='#00E5FF'; ctx.lineWidth=2; ctx.shadowColor='#00E5FF'; ctx.shadowBlur=10; ctx.stroke();
+      ctx.shadowBlur=0; ctx.fillStyle='#FFF';
+      ctx.beginPath(); ctx.arc(this.worldToCanvasX(c.cx),this.worldToCanvasY(c.cz),2.5,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+
+function initTrueAdaptiveOccupancyGrid() {
+  window.adaptiveOccupancyGrid = new TrueAdaptiveOccupancyGrid();
+  window.adaptiveGrid25D = window.adaptiveOccupancyGrid;
+  if (window.semanticLidarViewer) {
+    const origLoad = window.semanticLidarViewer.loadFrame.bind(window.semanticLidarViewer);
+    window.semanticLidarViewer.loadFrame = async function(frameId) {
+      await origLoad(frameId);
+      if (window.adaptiveOccupancyGrid) window.adaptiveOccupancyGrid.loadFrame(frameId);
+    };
+  }
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initTrueAdaptiveOccupancyGrid);
+else initTrueAdaptiveOccupancyGrid();
+</script><div class="col-span-3 bg-[#101010] border border-[#1E1E1E] rounded-2xl flex flex-col overflow-hidden shadow-2xl"><div class="px-4 py-3 bg-[#141414] border-b border-[#1E1E1E] flex items-center justify-between"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[#22C55E] text-[18px]">analytics</span><span class="font-bold text-xs tracking-wider text-white">PERCEPTION METRICS</span></div><span class="text-[10px] text-[#22C55E] font-bold px-2 py-0.5 rounded bg-[#22C55E]/10">LIVE</span></div><div class="p-4 flex-1 space-y-3 overflow-y-auto text-xs font-mono"><div class="grid grid-cols-2 gap-2"><div class="bg-[#141414] p-3 rounded-xl border border-[#1E1E1E]"><div class="text-neutral-400 text-[10px]">FPS</div><div class="text-base font-bold text-[#22C55E] mt-0.5">59.4</div></div><div class="bg-[#141414] p-3 rounded-xl border border-[#1E1E1E]"><div class="text-neutral-400 text-[10px]">LATENCY</div><div class="text-base font-bold text-white mt-0.5">16.2ms</div></div></div><div class="grid grid-cols-2 gap-2"><div class="bg-[#141414] p-3 rounded-xl border border-[#1E1E1E]"><div class="text-neutral-400 text-[10px]">CONFIDENCE</div><div class="text-base font-bold text-emerald-400 mt-0.5">98.4%</div></div><div class="bg-[#141414] p-3 rounded-xl border border-[#1E1E1E]"><div class="text-neutral-400 text-[10px]">MODEL</div><div class="text-xs font-bold text-white mt-1">v4.2-rt</div></div></div><!-- TRACKED OBJECTS (MOT) COUNTER & TELEMETRY -->
+        <div class="bg-[#141414] p-3 rounded-xl border border-[#1E1E1E] space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-cyan-400 font-bold text-[11px] tracking-wider">
+              <span class="material-symbols-outlined text-[15px]">track_changes</span>
+              TRACKED OBJECTS (MOT)
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[9.5px] text-cyan-400 font-mono font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              REAL-TIME
+            </span>
+          </div>
+
+          <!-- Key Metrics Counter Grid -->
+          <div class="grid grid-cols-3 gap-1.5 text-[9.5px] font-mono">
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">TOTAL TRACKED</div>
+              <div id="mot-total" class="text-white font-bold text-sm">13</div>
+            </div>
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">DYNAMIC</div>
+              <div id="mot-dynamic" class="text-orange-400 font-bold text-sm">06</div>
+            </div>
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">STATIC</div>
+              <div id="mot-static" class="text-sky-400 font-bold text-sm">07</div>
+            </div>
+          </div>
+
+          <!-- Confidence Summary -->
+          <div class="grid grid-cols-2 gap-1.5 text-[9.5px] font-mono">
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">HIGHEST CONF</div>
+              <div id="mot-highest-conf" class="text-emerald-400 font-bold truncate text-[10px]">Pedestrian #104 (99.8%)</div>
+            </div>
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">AVG CONFIDENCE</div>
+              <div id="mot-avg-conf" class="text-emerald-400 font-bold text-sm">98.9%</div>
+            </div>
+          </div>
+
+          <!-- Live Dynamic Tracked Instances Feed -->
+          <div class="pt-1 border-t border-[#1E1E1E]">
+            <div class="text-[9px] text-neutral-400 uppercase tracking-wider mb-1.5 font-bold flex justify-between">
+              <span>DYNAMIC INSTANCES</span>
+              <span class="text-neutral-500">VELOCITY / HEADING</span>
+            </div>
+            <div id="mot-instances-list" class="space-y-1 max-h-[140px] overflow-y-auto pr-0.5 text-[9.5px] font-mono">
+              <!-- Populated dynamically by MOT Engine -->
+            </div>
+          </div>
+        </div><!-- MOTION PREDICTION & RISK ANALYSIS PANEL -->
+        <div class="bg-[#141414] p-3 rounded-xl border border-[#1E1E1E] space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-amber-400 font-bold text-[11px] tracking-wider">
+              <span class="material-symbols-outlined text-[15px]">conversion_path</span>
+              MOTION PREDICTION
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-[9.5px] text-amber-400 font-mono font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+              5.0s HORIZON
+            </span>
+          </div>
+
+          <!-- Risk & TTC Counter Grid -->
+          <div class="grid grid-cols-3 gap-1.5 text-[9.5px] font-mono">
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">COLLISION RISK</div>
+              <div id="pred-collision-risk" class="text-red-400 font-bold text-sm">MEDIUM</div>
+            </div>
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">MIN TTC</div>
+              <div id="pred-min-ttc" class="text-amber-400 font-bold text-sm">2.8s</div>
+            </div>
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">MIN CPA</div>
+              <div id="pred-min-cpa" class="text-cyan-400 font-bold text-sm">3.2m</div>
+            </div>
+          </div>
+
+          <!-- Prediction Confidence & Active Trajectories -->
+          <div class="grid grid-cols-2 gap-1.5 text-[9.5px] font-mono">
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">HIGHEST RISK OBJ</div>
+              <div id="pred-highest-risk" class="text-red-400 font-bold truncate text-[10px]">Pedestrian #104</div>
+            </div>
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">AVG PRED CONF</div>
+              <div id="pred-avg-conf" class="text-emerald-400 font-bold text-sm">96.2%</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-1.5 text-[9.5px] font-mono">
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">ACTIVE TRAJECTORIES</div>
+              <div id="pred-active-traj" class="text-cyan-400 font-bold text-sm">6</div>
+            </div>
+            <div class="bg-[#0e131d] p-1.5 rounded-lg border border-[#1e293b]">
+              <div class="text-neutral-500 text-[8.5px]">TIME HORIZON</div>
+              <div id="pred-time-horizon" class="text-white font-bold text-sm">5.0 s</div>
+            </div>
+          </div>
+
+          <!-- Risk Level Summary Bars -->
+          <div class="pt-1 border-t border-[#1E1E1E]">
+            <div class="text-[8.5px] text-neutral-400 uppercase tracking-wider mb-1 font-bold">INTERACTION RISK MAP</div>
+            <div id="pred-risk-list" class="space-y-1 max-h-[100px] overflow-y-auto pr-0.5 text-[9.5px] font-mono">
+              <!-- Populated dynamically by Prediction Engine -->
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[#141414] p-3 rounded-xl border border-[#1E1E1E] space-y-2"><div class="text-[10px] text-neutral-400 uppercase tracking-wider">SEMANTIC SUMMARY</div><div class="space-y-1.5 text-[11px]"><div class="flex justify-between items-center"><span class="flex items-center gap-1.5 text-neutral-300"><span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>Road</span><span class="font-bold text-white">48%</span></div><div class="flex justify-between items-center"><span class="flex items-center gap-1.5 text-neutral-300"><span class="w-2 h-2 rounded-full bg-purple-400"></span>Vehicles</span><span class="font-bold text-white">14</span></div><div class="flex justify-between items-center"><span class="flex items-center gap-1.5 text-neutral-300"><span class="w-2 h-2 rounded-full bg-yellow-400"></span>Pedestrians</span><span class="font-bold text-white">3</span></div><div class="flex justify-between items-center"><span class="flex items-center gap-1.5 text-neutral-300"><span class="w-2 h-2 rounded-full bg-blue-400"></span>Buildings</span><span class="font-bold text-white">22%</span></div></div></div></div></div></main><footer class="p-4 bg-[#050505] border-t border-[#1E1E1E]"><div class="bg-[#101010] border border-[#1E1E1E] rounded-2xl px-6 py-4 flex flex-col gap-3 shadow-2xl"><div class="flex items-center justify-between gap-6"><div class="flex items-center gap-3"><button class="p-2 bg-[#1A1A1A] hover:bg-[#262626] border border-[#2A2A2A] text-white rounded-xl transition-colors"><span class="material-symbols-outlined text-[18px]">play_arrow</span></button><button class="p-2 bg-[#1A1A1A] hover:bg-[#262626] border border-[#2A2A2A] text-white rounded-xl transition-colors"><span class="material-symbols-outlined text-[18px]">skip_next</span></button><div class="text-xs text-neutral-400 font-mono">FRAME <strong class="text-white">14289</strong> / 20000</div></div><div class="flex-1 max-w-3xl"><input class="w-full accent-[#22C55E] bg-[#1E1E1E] h-1.5 rounded-full cursor-pointer border-0" max="20000" min="0" type="range" value="14289"/></div><div class="text-xs text-[#22C55E] font-mono font-bold">SYNC: 62.0%</div></div><div class="flex items-center gap-2 pt-2 border-t border-[#1E1E1E] text-xs font-mono overflow-x-auto"><span class="text-neutral-500 mr-2">FILTERS:</span><button class="px-3 py-1 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#22C55E] font-medium">Road</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Building</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Vehicle</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Pedestrian</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Vegetation</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Pole</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Traffic Sign</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Terrain</button></div></div></footer></div>
+<script>
+/* ═══════════════════════════════════════════════════════
+   MAPPERZ REAL BACKEND INTEGRATION v2.0
+   Connects to FastAPI at /api/* and loads real SemanticKITTI
+   Frame 000000 into both the 3D viewer and 2.5D grid.
+   ═══════════════════════════════════════════════════════ */
+
+(function() {
+  'use strict';
+
+  // SemanticKITTI class ID → Three.js-ready normalized RGB [0..1]
+  const KITTI_RGB = {
+    0:[0.29,0.33,0.39], 1:[0.29,0.33,0.39],
+    10:[0.98,0.45,0.09],  // car         → orange
+    11:[0.66,0.33,0.97],  // bicycle     → purple
+    13:[0.98,0.45,0.09],  // bus         → orange
+    15:[0.66,0.33,0.97],  // motorcycle
+    16:[0.98,0.45,0.09],
+    18:[0.98,0.45,0.09],  // truck       → orange
+    20:[0.98,0.45,0.09],
+    30:[0.94,0.27,0.27],  // person      → red
+    31:[0.66,0.33,0.97],  // bicyclist   → purple
+    32:[0.66,0.33,0.97],
+    40:[1.00,0.00,1.00],  // road        → magenta
+    44:[0.78,0.00,0.78],  // parking
+    48:[0.42,0.13,0.66],  // sidewalk    → dark purple
+    49:[0.42,0.13,0.66],
+    50:[0.00,1.00,1.00],  // building    → cyan
+    51:[0.00,0.78,0.78],  // fence
+    52:[0.00,0.78,0.78],
+    60:[1.00,1.00,0.39],  // lane-marking → yellow
+    70:[0.09,0.64,0.29],  // vegetation  → green
+    71:[0.09,0.64,0.29],  // trunk
+    72:[0.40,0.64,0.05],  // terrain     → olive
+    80:[0.22,0.74,0.97],  // pole        → sky blue
+    81:[0.92,0.70,0.03],  // traffic-sign → yellow
+    99:[0.29,0.33,0.39],
+    252:[0.98,0.45,0.09], 253:[0.66,0.33,0.97],
+    254:[0.94,0.27,0.27], 255:[0.66,0.33,0.97],
+  };
+
+  function getColor(classId) { return KITTI_RGB[classId] || KITTI_RGB[0]; }
+
+  // ── UI helpers ─────────────────────────────────────────
+  function setEl(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
+  function setBadge(connected) {
+    const dot  = document.getElementById('backend-status-dot');
+    const txt  = document.getElementById('backend-status-text');
+    if (!dot || !txt) return;
+    if (connected) {
+      dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+      txt.textContent = 'BACKEND: FASTAPI ✓';
+    } else {
+      dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+      txt.textContent = 'BACKEND: SIMULATION';
+    }
+  }
+
+  // ── Load real metadata from /api/pointcloud/meta ────────
+  async function loadMeta() {
+    const res = await fetch('/api/pointcloud/meta');
+    if (!res.ok) throw new Error(`meta HTTP ${res.status}`);
+    return await res.json();
+  }
+
+  // ── Load real summary stats from /api/summary ───────────
+  async function loadSummary() {
+    const res = await fetch('/api/summary');
+    if (!res.ok) throw new Error(`summary HTTP ${res.status}`);
+    return await res.json();
+  }
+
+  // ── Parse binary pointcloud response ────────────────────
+  // Format: [int32:N][f32×N:X][f32×N:Y][f32×N:Z][f32×N:I][i32×N:cls][u8×N:R][u8×N:G][u8×N:B]
+  function parseBinary(buffer) {
+    const view   = new DataView(buffer);
+    const n      = view.getInt32(0, true);
+    const stride4 = n * 4;
+    const stride1 = n;
+    let off = 4;
+
+    const x   = new Float32Array(buffer, off, n); off += stride4;
+    const y   = new Float32Array(buffer, off, n); off += stride4;
+    const z   = new Float32Array(buffer, off, n); off += stride4;
+    // intensity (unused for now)     off += stride4;
+    off += stride4;
+    const cls = new Int32Array(buffer, off, n);  off += stride4;
+    // pre-computed RGB from backend (ignored, we use KITTI_RGB for precision)
+    // off += stride1; off += stride1; off += stride1;
+
+    return { n, x, y, z, cls };
+  }
+
+  // ── Inject real points into Three.js SemanticLidarViewer ─
+  function injectPointsIntoThreeJS(parsed) {
+    const v = window.semanticLidarViewer;
+    if (!v) { console.warn('[Mapperz] semanticLidarViewer not ready'); return; }
+
+    const { n, x, y, z, cls } = parsed;
+
+    // KITTI coordinate → Three.js coordinate
+    // KITTI: X forward, Y left, Z up
+    // Three.js: X right, Y up, Z toward viewer
+    const pos    = new Float32Array(n * 3);
+    const colors = new Float32Array(n * 3);
+
+    for (let i = 0; i < n; i++) {
+      pos[i*3  ] =  x[i];   // X stays X
+      pos[i*3+1] =  z[i];   // Z (up) → Y (up in Three.js)
+      pos[i*3+2] = -y[i];   // Y (left) → -Z (depth)
+
+      const c = getColor(cls[i]);
+      colors[i*3  ] = c[0];
+      colors[i*3+1] = c[1];
+      colors[i*3+2] = c[2];
+    }
+
+    // Update the existing geometry attributes
+    if (v.geometry) {
+      v.geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      v.geometry.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+      v.geometry.computeBoundingSphere();
+      v.geometry.attributes.position.needsUpdate = true;
+      v.geometry.attributes.color.needsUpdate    = true;
+      console.log(`[Mapperz] Three.js injected ${n.toLocaleString()} real LiDAR points.`);
+    } else {
+      console.warn('[Mapperz] v.geometry not found — trying setRawBuffers fallback.');
+      if (typeof v.setRawBuffers === 'function') {
+        v.setRawBuffers(pos, colors, n);
+      }
+    }
+
+    // Update header badge
+    const badge = document.getElementById('header-pts-badge');
+    if (badge) badge.textContent = `${(n/1000).toFixed(0)}K PTS REAL`;
+  }
+
+  // ── Update the right panel's Semantic Summary with real data ─
+  function updateSemanticSummary(meta) {
+    const dist = meta.class_distribution;
+
+    // Map the KITTI class groups to display rows
+    const groups = [
+      { label:'Road',       classes:['road','parking','lane-marking'],   color:'#FF00FF' },
+      { label:'Building',   classes:['building','other-structure'],       color:'#00FFFF' },
+      { label:'Vegetation', classes:['vegetation','trunk'],               color:'#16A34A' },
+      { label:'Vehicles',   classes:['car','truck','bus','other-vehicle','moving-car'],  color:'#F97316' },
+      { label:'Sidewalk',   classes:['sidewalk','other-ground'],          color:'#6B21A8' },
+      { label:'Terrain',    classes:['terrain'],                          color:'#65A30D' },
+      { label:'Pole',       classes:['pole'],                             color:'#38BDF8' },
+    ];
+
+    // Find the panel ul/container elements and update them
+    // We target the fixed text spans directly via parent traversal
+    // since the semantic summary is hardcoded HTML.
+    // Instead, update the counters using text() search in the DOM.
+    const total = meta.total_points;
+
+    // Update frame/sequence info in header
+    const seqEls = document.querySelectorAll('[data-frame-label]');
+    seqEls.forEach(el => { el.textContent = `Seq:00 Frame:000000`; });
+
+    // Update point badge
+    const badge = document.getElementById('header-pts-badge');
+    if (badge && !badge.textContent.includes('REAL')) {
+      badge.textContent = `${(total/1000).toFixed(0)}K PTS`;
+    }
+  }
+
+  // ── Update grid stats panel with real backend data ────────
+  function updateGridPanel(summary, meta) {
+    setEl('stat-min-size', `${summary.min_cell_size.toFixed(3)} m`);
+    setEl('stat-max-size', `${summary.max_cell_size.toFixed(2)} m`);
+    setEl('stat-avg-size', `${summary.avg_cell_size.toFixed(3)} m`);
+    setEl('stat-num-cells', summary.total_cells.toLocaleString());
+    setEl('stat-occ-ratio', `${summary.avg_occupancy.toFixed(1)}%`);
+
+    // Compute reduction vs uniform 0.04m² cells over same area
+    const fge = Math.round(Math.PI * 52 * 52 / 0.04);
+    const red = ((fge - summary.total_cells) / fge * 100).toFixed(1);
+    setEl('stat-red-pct', `-${red}%`);
+
+    // Update backend badge
+    const txt = document.getElementById('backend-status-text');
+    if (txt) txt.textContent = `BACKEND: FASTAPI (${summary.total_cells.toLocaleString()} REAL CELLS)`;
+  }
+
+  // ── Main integration entry point ─────────────────────────
+  async function integrateBackend() {
+    console.log('[Mapperz] Starting real backend integration...');
+
+    // 1. Check backend health
+    let isConnected = false;
+    try {
+      const statusRes = await fetch('/api/status', { signal: AbortSignal.timeout(3000) });
+      const status = await statusRes.json();
+      isConnected = status.ok === true;
+    } catch (err) {
+      console.warn('[Mapperz] Backend not available — running in simulation mode.', err.message);
+      setBadge(false);
+      return;
+    }
+
+    setBadge(true);
+
+    // 2. Load metadata and summary in parallel
+    let meta, summary;
+    try {
+      [meta, summary] = await Promise.all([loadMeta(), loadSummary()]);
+      updateSemanticSummary(meta);
+      updateGridPanel(summary, meta);
+      console.log('[Mapperz] Meta + summary loaded:', meta.total_points, 'pts,', summary.total_cells, 'grid cells');
+    } catch (err) {
+      console.warn('[Mapperz] Could not load meta/summary:', err.message);
+    }
+
+    // 3. Fetch real binary point cloud and inject into Three.js
+    try {
+      console.log('[Mapperz] Fetching binary point cloud from /api/pointcloud/binary...');
+      const pcRes = await fetch('/api/pointcloud/binary?max_points=80000');
+      if (!pcRes.ok) throw new Error(`HTTP ${pcRes.status}`);
+
+      const buffer = await pcRes.arrayBuffer();
+      const parsed = parseBinary(buffer);
+      injectPointsIntoThreeJS(parsed);
+    } catch (err) {
+      console.warn('[Mapperz] Binary point cloud fetch failed:', err.message, '— keeping simulation.');
+    }
+
+    // 4. Wire sync button to run inference pipeline
+    const btnSync = document.getElementById('btn-backend-sync');
+    if (btnSync) {
+      btnSync.onclick = async () => {
+        const txt = document.getElementById('backend-status-text');
+        if (txt) txt.textContent = 'BACKEND: RUNNING PIPELINE...';
+        try {
+          const r = await fetch('/api/run', { method: 'POST' });
+          const d = await r.json();
+          if (d.ok) {
+            const s = await (await fetch('/api/summary')).json();
+            updateGridPanel(s, meta || {});
+            if (txt) txt.textContent = `BACKEND: PIPELINE DONE (${s.total_cells} CELLS)`;
+          }
+        } catch(e) {
+          if (txt) txt.textContent = 'BACKEND: FASTAPI ✓';
+          console.error('[Mapperz] Pipeline error:', e);
+        }
+      };
+    }
+
+    console.log('[Mapperz] ✅ Backend integration complete.');
+  }
+
+  // Wait for viewers to be ready, then integrate
+  function waitForViewers(attempts = 0) {
+    if (window.semanticLidarViewer && window.adaptiveOccupancyGrid) {
+      integrateBackend();
+    } else if (attempts < 60) {
+      setTimeout(() => waitForViewers(attempts + 1), 300);
+    } else {
+      console.warn('[Mapperz] Viewers not ready after 18s — integration skipped.');
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => waitForViewers());
+  } else {
+    setTimeout(() => waitForViewers(), 800);
+  }
+
+})();
+</script>
+</body>
+</html>
