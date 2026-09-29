@@ -2560,7 +2560,7 @@ else initTrueAdaptiveOccupancyGrid();
         <div class="bg-[#141414] p-3 rounded-xl border border-[#1E1E1E] space-y-2"><div class="text-[10px] text-neutral-400 uppercase tracking-wider">SEMANTIC SUMMARY</div><div class="space-y-1.5 text-[11px]"><div class="flex justify-between items-center"><span class="flex items-center gap-1.5 text-neutral-300"><span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>Road</span><span class="font-bold text-white">48%</span></div><div class="flex justify-between items-center"><span class="flex items-center gap-1.5 text-neutral-300"><span class="w-2 h-2 rounded-full bg-purple-400"></span>Vehicles</span><span class="font-bold text-white">14</span></div><div class="flex justify-between items-center"><span class="flex items-center gap-1.5 text-neutral-300"><span class="w-2 h-2 rounded-full bg-yellow-400"></span>Pedestrians</span><span class="font-bold text-white">3</span></div><div class="flex justify-between items-center"><span class="flex items-center gap-1.5 text-neutral-300"><span class="w-2 h-2 rounded-full bg-blue-400"></span>Buildings</span><span class="font-bold text-white">22%</span></div></div></div></div></div></main><footer class="p-4 bg-[#050505] border-t border-[#1E1E1E]"><div class="bg-[#101010] border border-[#1E1E1E] rounded-2xl px-6 py-4 flex flex-col gap-3 shadow-2xl"><div class="flex items-center justify-between gap-6"><div class="flex items-center gap-3"><button class="p-2 bg-[#1A1A1A] hover:bg-[#262626] border border-[#2A2A2A] text-white rounded-xl transition-colors"><span class="material-symbols-outlined text-[18px]">play_arrow</span></button><button class="p-2 bg-[#1A1A1A] hover:bg-[#262626] border border-[#2A2A2A] text-white rounded-xl transition-colors"><span class="material-symbols-outlined text-[18px]">skip_next</span></button><div class="text-xs text-neutral-400 font-mono">FRAME <strong class="text-white">14289</strong> / 20000</div></div><div class="flex-1 max-w-3xl"><input class="w-full accent-[#22C55E] bg-[#1E1E1E] h-1.5 rounded-full cursor-pointer border-0" max="20000" min="0" type="range" value="14289"/></div><div class="text-xs text-[#22C55E] font-mono font-bold">SYNC: 62.0%</div></div><div class="flex items-center gap-2 pt-2 border-t border-[#1E1E1E] text-xs font-mono overflow-x-auto"><span class="text-neutral-500 mr-2">FILTERS:</span><button class="px-3 py-1 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#22C55E] font-medium">Road</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Building</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Vehicle</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Pedestrian</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Vegetation</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Pole</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Traffic Sign</button><button class="px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-neutral-300 hover:text-white">Terrain</button></div></div></footer></div>
 <script>
 /* ═══════════════════════════════════════════════════════
-   MAPPERZ REAL BACKEND INTEGRATION v2.0
+   PERCEPTA REAL BACKEND INTEGRATION v2.0
    Connects to FastAPI at /api/* and loads real SemanticKITTI
    Frame 000000 into both the 3D viewer and 2.5D grid.
    ═══════════════════════════════════════════════════════ */
@@ -2654,7 +2654,7 @@ else initTrueAdaptiveOccupancyGrid();
   // ── Inject real points into Three.js SemanticLidarViewer ─
   function injectPointsIntoThreeJS(parsed) {
     const v = window.semanticLidarViewer;
-    if (!v) { console.warn('[Mapperz] semanticLidarViewer not ready'); return; }
+    if (!v) { console.warn('[PERCEPTA] semanticLidarViewer not ready'); return; }
 
     const { n, x, y, z, cls } = parsed;
 
@@ -2682,9 +2682,9 @@ else initTrueAdaptiveOccupancyGrid();
       v.geometry.computeBoundingSphere();
       v.geometry.attributes.position.needsUpdate = true;
       v.geometry.attributes.color.needsUpdate    = true;
-      console.log(`[Mapperz] Three.js injected ${n.toLocaleString()} real LiDAR points.`);
+      console.log(`[PERCEPTA] Three.js injected ${n.toLocaleString()} real LiDAR points.`);
     } else {
-      console.warn('[Mapperz] v.geometry not found — trying setRawBuffers fallback.');
+      console.warn('[PERCEPTA] v.geometry not found — trying setRawBuffers fallback.');
       if (typeof v.setRawBuffers === 'function') {
         v.setRawBuffers(pos, colors, n);
       }
@@ -2747,7 +2747,7 @@ else initTrueAdaptiveOccupancyGrid();
 
   // ── Main integration entry point ─────────────────────────
   async function integrateBackend() {
-    console.log('[Mapperz] Starting real backend integration...');
+    console.log('[PERCEPTA] Starting real backend integration...');
 
     // 1. Check backend health
     let isConnected = false;
@@ -2756,7 +2756,7 @@ else initTrueAdaptiveOccupancyGrid();
       const status = await statusRes.json();
       isConnected = status.ok === true;
     } catch (err) {
-      console.warn('[Mapperz] Backend not available — running in simulation mode.', err.message);
+      console.warn('[PERCEPTA] Backend not available — running in simulation mode.', err.message);
       setBadge(false);
       return;
     }
@@ -2769,14 +2769,14 @@ else initTrueAdaptiveOccupancyGrid();
       [meta, summary] = await Promise.all([loadMeta(), loadSummary()]);
       updateSemanticSummary(meta);
       updateGridPanel(summary, meta);
-      console.log('[Mapperz] Meta + summary loaded:', meta.total_points, 'pts,', summary.total_cells, 'grid cells');
+      console.log('[PERCEPTA] Meta + summary loaded:', meta.total_points, 'pts,', summary.total_cells, 'grid cells');
     } catch (err) {
-      console.warn('[Mapperz] Could not load meta/summary:', err.message);
+      console.warn('[PERCEPTA] Could not load meta/summary:', err.message);
     }
 
     // 3. Fetch real binary point cloud and inject into Three.js
     try {
-      console.log('[Mapperz] Fetching binary point cloud from /api/pointcloud/binary...');
+      console.log('[PERCEPTA] Fetching binary point cloud from /api/pointcloud/binary...');
       const pcRes = await fetch('/api/pointcloud/binary?max_points=80000');
       if (!pcRes.ok) throw new Error(`HTTP ${pcRes.status}`);
 
@@ -2784,7 +2784,7 @@ else initTrueAdaptiveOccupancyGrid();
       const parsed = parseBinary(buffer);
       injectPointsIntoThreeJS(parsed);
     } catch (err) {
-      console.warn('[Mapperz] Binary point cloud fetch failed:', err.message, '— keeping simulation.');
+      console.warn('[PERCEPTA] Binary point cloud fetch failed:', err.message, '— keeping simulation.');
     }
 
     // 4. Wire sync button to run inference pipeline
@@ -2803,12 +2803,12 @@ else initTrueAdaptiveOccupancyGrid();
           }
         } catch(e) {
           if (txt) txt.textContent = 'BACKEND: FASTAPI ✓';
-          console.error('[Mapperz] Pipeline error:', e);
+          console.error('[PERCEPTA] Pipeline error:', e);
         }
       };
     }
 
-    console.log('[Mapperz] ✅ Backend integration complete.');
+    console.log('[PERCEPTA] ✅ Backend integration complete.');
   }
 
   // Wait for viewers to be ready, then integrate
@@ -2818,7 +2818,7 @@ else initTrueAdaptiveOccupancyGrid();
     } else if (attempts < 60) {
       setTimeout(() => waitForViewers(attempts + 1), 300);
     } else {
-      console.warn('[Mapperz] Viewers not ready after 18s — integration skipped.');
+      console.warn('[PERCEPTA] Viewers not ready after 18s — integration skipped.');
     }
   }
 
